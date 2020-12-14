@@ -1,4 +1,9 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { IsDate, IsString, IsUrl } from 'class-validator';
 import {
   Column,
@@ -8,14 +13,20 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-type Availability = 'only me' | 'my followers' | 'public';
+enum Availability {
+  Private,
+  Followers,
+  Public,
+}
+
+registerEnumType(Availability, { name: 'Availability' });
 
 @InputType('TripInputType', { isAbstract: true })
-@ObjectType()
-@Entity()
+@ObjectType() // 자동으로 스키마를 빌드하기 위한 GraphQL decorator
+@Entity() // TypeORM이 database에 저장할 수 있도록 하는 decorator
 export class Trip {
-  @Field(() => Number)
-  @PrimaryGeneratedColumn()
+  @Field(() => Number) // Field fot graphql schema
+  @PrimaryGeneratedColumn() // column for typeORM
   id: number;
 
   @Field(() => Date)
@@ -51,8 +62,8 @@ export class Trip {
   @IsUrl()
   coverUrl: string;
 
-  @Field(() => String)
-  @Column()
+  @Field(() => Availability)
+  @Column({ type: 'enum', enum: Availability })
   availability: Availability;
 
   // creator

@@ -8,6 +8,8 @@ import { AppService } from './app.service';
 import { User } from './user/entities/user.entity';
 import { UsersModule } from './user/user.module';
 import { TripsModule } from './trip/trip.module';
+import { Trip } from './trip/entities/trip.entity';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -35,10 +37,11 @@ import { TripsModule } from './trip/trip.module';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [User],
+      entities: [User, Trip], // typeORM will only take care of these entities.
     }),
     UsersModule,
     TripsModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
