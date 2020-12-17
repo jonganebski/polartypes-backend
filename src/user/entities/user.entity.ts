@@ -8,18 +8,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import argon2 from 'argon2';
+import * as argon2 from 'argon2';
 import { InternalServerErrorException } from '@nestjs/common';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class User {
+export class Users {
+  // This table is named in plural because trying to avoid confusion with postgresql's default user table.
   @BeforeInsert()
   async hashPassword(): Promise<void> {
     try {
       this.password = await argon2.hash(this.password);
-    } catch {
+    } catch (err) {
       throw new InternalServerErrorException();
     }
   }
@@ -61,10 +62,10 @@ export class User {
   @IsString()
   lastName: string;
 
-  @Field(() => String)
-  @Column()
+  @Field(() => String, { nullable: true }) // just for now
+  @Column({ nullable: true })
   @IsUrl()
-  avatarUrl: string;
+  avatarUrl?: string;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })

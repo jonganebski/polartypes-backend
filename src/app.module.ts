@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { User } from './user/entities/user.entity';
+import { Users } from './user/entities/user.entity';
 import { UsersModule } from './user/user.module';
 import { TripsModule } from './trip/trip.module';
 import { Trip } from './trip/entities/trip.entity';
@@ -37,7 +37,7 @@ import { CommentModule } from './comment/comment.module';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [User, Trip], // typeORM will only take care of these entities.
+      entities: [Users, Trip], // typeORM will only take care of these entities.
     }),
     UsersModule,
     TripsModule,

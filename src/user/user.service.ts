@@ -5,12 +5,12 @@ import {
   CreateAccountInput,
   CreateAccountOutput,
 } from './dto/create-account.dto';
-import { User } from './entities/user.entity';
+import { Users } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(Users) private readonly userRepo: Repository<Users>,
   ) {}
 
   async createAccount({
@@ -24,8 +24,25 @@ export class UserService {
       if (existUser) {
         return { ok: false, error: 'Email already exists.' };
       }
+      let username = firstName + lastName;
+      let count = 0;
+      while (true) {
+        const existUser = await this.userRepo.findOne({ username });
+        if (existUser) {
+          ++count;
+          username = username + count + '';
+        } else {
+          break;
+        }
+      }
       await this.userRepo.save(
-        this.userRepo.create({ email, password, firstName, lastName }),
+        this.userRepo.create({
+          email,
+          password,
+          firstName,
+          lastName,
+          username,
+        }),
       );
       return { ok: true };
     } catch {
