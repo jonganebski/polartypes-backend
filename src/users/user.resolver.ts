@@ -1,17 +1,23 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { AuthGuard } from 'src/auth/auth.guard';
 import {
   CreateAccountInput,
   CreateAccountOutput,
 } from './dto/create-account.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
+import { Users } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @Resolver()
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
-  @Query(() => Boolean)
-  whoAmI(): boolean {
-    return true;
+
+  @UseGuards(AuthGuard)
+  @Query(() => Users)
+  whoAmI(@AuthUser() user: Users): Users {
+    return user;
   }
 
   @Mutation(() => CreateAccountOutput)

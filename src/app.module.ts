@@ -17,6 +17,7 @@ import { Trip } from './trip/entities/trip.entity';
 import { CommentModule } from './comment/comment.module';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,7 +35,10 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
         JWT_PRIVATE_KEY: Joi.string().required(),
       }),
     }),
-    GraphQLModule.forRoot({ autoSchemaFile: true }),
+    GraphQLModule.forRoot({
+      autoSchemaFile: true,
+      context: ({ req }) => ({ user: req['user'] }),
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -51,6 +55,7 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
     TripsModule,
     CommentModule,
     JwtModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
