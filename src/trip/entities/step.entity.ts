@@ -1,5 +1,5 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsArray, IsDate, IsString } from 'class-validator';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { IsArray, IsDate, IsNumber, IsString } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -39,10 +39,10 @@ export class Step {
   @IsString()
   name: string;
 
-  @Field(() => Date)
+  @Field(() => Int)
   @Column()
-  @IsDate()
-  arrivedAt: Date;
+  @IsNumber()
+  arrivedAt: number;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })

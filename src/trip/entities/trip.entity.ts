@@ -1,19 +1,23 @@
 import {
   Field,
   InputType,
+  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsDate, IsString, IsUrl } from 'class-validator';
+import { IsNumber, IsString, IsUrl } from 'class-validator';
+import { Users } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from 'typeorm';
 
-enum Availability {
+export enum Availability {
   Private,
   Followers,
   Public,
@@ -37,15 +41,15 @@ export class Trip {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Field(() => Date)
+  @Field(() => Int)
   @Column()
-  @IsDate()
-  startDate: Date;
+  @IsNumber()
+  startUnix: number; // unix in seconds.
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => Int, { nullable: true })
   @Column({ nullable: true })
-  @IsDate()
-  endDate: Date;
+  @IsNumber()
+  endUnix?: number; // unix in seconds.
 
   @Field(() => String)
   @Column()
@@ -55,18 +59,24 @@ export class Trip {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   @IsString()
-  summary: string;
+  summary?: string;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   @IsUrl()
-  coverUrl: string;
+  coverUrl?: string;
 
   @Field(() => Availability)
   @Column({ type: 'enum', enum: Availability })
   availability: Availability;
 
   // creator
+  @Field(() => Users)
+  @ManyToOne(() => Users, (user) => user.trip)
+  traveler: Users;
+
+  @RelationId((trip: Trip) => trip.traveler)
+  travelerId: number;
 
   // steps
 }

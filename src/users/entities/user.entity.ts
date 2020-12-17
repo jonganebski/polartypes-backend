@@ -5,11 +5,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as argon2 from 'argon2';
 import { InternalServerErrorException } from '@nestjs/common';
+import { Trip } from 'src/trip/entities/trip.entity';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -90,11 +92,20 @@ export class Users {
   timeZone: string;
 
   // trips
+  @Field(() => [Trip])
+  @OneToMany(() => Trip, (trip) => trip.traveler, { onDelete: 'CASCADE' })
+  trip: Trip[];
 
   // followers
 
-  // followings
+  @Field(() => [Users])
+  @OneToMany(() => Users, (user) => user.followings)
+  followers: Users[];
 
+  // followings
+  @Field(() => [Users])
+  @OneToMany(() => Users, (user) => user.followers)
+  followings: Users[];
   // comments
 
   // likes

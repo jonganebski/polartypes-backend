@@ -1,16 +1,18 @@
-import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { string } from 'joi';
+import { Field, InputType, Int, ObjectType, PickType } from '@nestjs/graphql';
 import { Trip } from '../entities/trip.entity';
 
 @InputType()
 export class CreateTripInput extends PickType(Trip, [
   'name',
-  'startDate',
-  'endDate',
-  'coverUrl',
+  'startUnix',
   'availability',
-  'summary',
-]) {}
+]) {
+  @Field(() => String, { nullable: true })
+  summary?: string;
+
+  @Field(() => Int, { nullable: true })
+  endUnix?: number;
+}
 
 @ObjectType()
 export class CreateTripOutput {
