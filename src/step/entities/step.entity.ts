@@ -1,10 +1,14 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { IsArray, IsDate, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsString } from 'class-validator';
+import { Trip } from 'src/trip/entities/trip.entity';
+import { Users } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -30,7 +34,7 @@ export class Step {
   country: string;
 
   @Field(() => [Number])
-  @Column()
+  @Column({ type: 'float', array: true })
   @IsArray()
   coord: number[];
 
@@ -47,10 +51,10 @@ export class Step {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   @IsString()
-  story: string;
+  story?: string;
 
   @Field(() => [String])
-  @Column()
+  @Column({ type: 'text', array: true })
   @IsArray()
   photoUrls: string[];
 
@@ -58,5 +62,19 @@ export class Step {
 
   // cooments
 
+  // user
+  @Field(() => Users)
+  @ManyToOne(() => Users, (user) => user.steps)
+  traveler: Users;
+
+  @RelationId((step: Step) => step.traveler)
+  travelerId: number;
+
   // trip
+  @Field(() => Trip)
+  @ManyToOne(() => Trip, (trip) => trip.steps)
+  trip: Trip;
+
+  @RelationId((step: Step) => step.trip)
+  tripId: number;
 }

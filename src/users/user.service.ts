@@ -45,6 +45,8 @@ export class UserService {
           firstName,
           lastName,
           username,
+          followers: [],
+          followings: [],
         }),
       );
       return { ok: true };

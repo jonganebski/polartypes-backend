@@ -6,12 +6,14 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { IsNumber, IsString, IsUrl } from 'class-validator';
+import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
@@ -72,11 +74,14 @@ export class Trip {
 
   // creator
   @Field(() => Users)
-  @ManyToOne(() => Users, (user) => user.trip)
+  @ManyToOne(() => Users, (user) => user.trips)
   traveler: Users;
 
   @RelationId((trip: Trip) => trip.traveler)
   travelerId: number;
 
   // steps
+  @Field(() => [Step])
+  @OneToMany(() => Step, (step) => step.trip)
+  steps: Step[];
 }

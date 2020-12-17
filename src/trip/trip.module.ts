@@ -8,5 +8,6 @@ import { TripService } from './trip.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Trip, Users])], // Injecting repository.
   providers: [TripResolver, TripService],
+  exports: [TripService],
 })
 export class TripsModule {}

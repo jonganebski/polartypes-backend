@@ -10,14 +10,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CommentModule } from './comment/comment.module';
+import { JwtMiddleware } from './jwt/jwt.middleware';
+import { JwtModule } from './jwt/jwt.module';
+import { Step } from './step/entities/step.entity';
+import { StepModule } from './step/step.module';
+import { Trip } from './trip/entities/trip.entity';
+import { TripsModule } from './trip/trip.module';
 import { Users } from './users/entities/user.entity';
 import { UsersModule } from './users/user.module';
-import { TripsModule } from './trip/trip.module';
-import { Trip } from './trip/entities/trip.entity';
-import { CommentModule } from './comment/comment.module';
-import { JwtModule } from './jwt/jwt.module';
-import { JwtMiddleware } from './jwt/jwt.middleware';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -49,12 +50,13 @@ import { AuthModule } from './auth/auth.module';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [Users, Trip], // typeORM will only take care of these entities.
+      entities: [Users, Trip, Step], // typeORM will only take care of these entities.
     }),
     UsersModule,
     TripsModule,
     CommentModule,
     JwtModule,
+    StepModule,
   ],
   controllers: [AppController],
   providers: [AppService],

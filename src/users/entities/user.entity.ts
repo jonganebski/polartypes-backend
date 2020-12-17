@@ -12,6 +12,7 @@ import {
 import * as argon2 from 'argon2';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Trip } from 'src/trip/entities/trip.entity';
+import { Step } from 'src/step/entities/step.entity';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -94,7 +95,12 @@ export class Users {
   // trips
   @Field(() => [Trip])
   @OneToMany(() => Trip, (trip) => trip.traveler, { onDelete: 'CASCADE' })
-  trip: Trip[];
+  trips: Trip[];
+
+  // steps
+  @Field(() => [Step])
+  @OneToMany(() => Step, (step) => step.traveler, { onDelete: 'CASCADE' })
+  steps: Step[];
 
   // followers
 
