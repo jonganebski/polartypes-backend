@@ -1,15 +1,22 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Users } from './user/entities/user.entity';
-import { UsersModule } from './user/user.module';
+import { Users } from './users/entities/user.entity';
+import { UsersModule } from './users/user.module';
 import { TripsModule } from './trip/trip.module';
 import { Trip } from './trip/entities/trip.entity';
 import { CommentModule } from './comment/comment.module';
+import { JwtModule } from './jwt/jwt.module';
+import { JwtMiddleware } from './jwt/jwt.middleware';
 
 @Module({
   imports: [
@@ -24,6 +31,7 @@ import { CommentModule } from './comment/comment.module';
         POSTGRES_USERNAME: Joi.string().required(),
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DATABASE: Joi.string().required(),
+        JWT_PRIVATE_KEY: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({ autoSchemaFile: true }),
@@ -42,8 +50,16 @@ import { CommentModule } from './comment/comment.module';
     UsersModule,
     TripsModule,
     CommentModule,
+    JwtModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}

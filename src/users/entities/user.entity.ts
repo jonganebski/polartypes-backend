@@ -25,6 +25,18 @@ export class Users {
     }
   }
 
+  async verifyPassword(inputPassword: string): Promise<boolean> {
+    try {
+      if (await argon2.verify(this.password, inputPassword)) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+  }
+
   @Field(() => Number)
   @PrimaryGeneratedColumn()
   id: number;
