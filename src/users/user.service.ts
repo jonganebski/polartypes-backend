@@ -17,6 +17,10 @@ import {
   ReadFollowingsOutput,
 } from './dto/read-followings.dto';
 import { UnfollowInput, UnfollowOutput } from './dto/unfollow.dto';
+import {
+  UpdateAccountInput,
+  UpdateAccountOutput,
+} from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
 
 @Injectable()
@@ -60,6 +64,29 @@ export class UserService {
       return { ok: true };
     } catch {
       return { ok: false, error: 'Failed to create account.' };
+    }
+  }
+
+  async updateAccount(
+    user: Users,
+    updateAccountInput: UpdateAccountInput,
+  ): Promise<UpdateAccountOutput> {
+    try {
+      const isUpdatingUsername = Boolean(
+        user.username !== updateAccountInput.username,
+      );
+      if (isUpdatingUsername) {
+        const isUsernameExists = await this.userRepo.findOne({
+          username: updateAccountInput.username,
+        });
+        if (isUsernameExists) {
+          return { ok: false, error: 'This username already exists.' };
+        }
+      }
+      await this.userRepo.save([{ id: user.id, ...updateAccountInput }]);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Failed to update account.' };
     }
   }
 

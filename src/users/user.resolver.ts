@@ -17,6 +17,10 @@ import {
   ReadFollowingsOutput,
 } from './dto/read-followings.dto';
 import { UnfollowInput, UnfollowOutput } from './dto/unfollow.dto';
+import {
+  UpdateAccountInput,
+  UpdateAccountOutput,
+} from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
 import { UserService } from './user.service';
 
@@ -35,6 +39,15 @@ export class UserResolver {
     @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
     return this.userService.createAccount(createAccountInput);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => UpdateAccountOutput)
+  updateAccount(
+    @AuthUser() user: Users,
+    @Args('input') updateAccountInput: UpdateAccountInput,
+  ): Promise<UpdateAccountOutput> {
+    return this.userService.updateAccount(user, updateAccountInput);
   }
 
   @Mutation(() => LoginOutput)
