@@ -5,6 +5,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -106,12 +108,13 @@ export class Users {
   // followers
 
   @Field(() => [Users])
-  @OneToMany(() => Users, (user) => user.followings)
+  @ManyToMany(() => Users, (user) => user.followings)
+  @JoinTable()
   followers: Users[];
 
   // followings
   @Field(() => [Users])
-  @OneToMany(() => Users, (user) => user.followers)
+  @ManyToMany(() => Users, (user) => user.followers, { cascade: true })
   followings: Users[];
 
   // comments

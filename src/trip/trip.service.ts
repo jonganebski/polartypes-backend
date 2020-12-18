@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/users/entities/user.entity';
+import { UserService } from 'src/users/user.service';
 import { Repository } from 'typeorm';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
 import { DeleteTripInput, DeleteTripOutput } from './dto/delete-trip.dto';
@@ -31,15 +32,20 @@ export class TripService {
 
   async readTrips(
     user: Users,
-    { targetUserId }: ReadTripsInput,
+    { targetUsername }: ReadTripsInput,
   ): Promise<ReadTripsOutput> {
     try {
       let availability: number;
-      const targetUser = await this.userRepo.findOne({ id: targetUserId });
+      const targetUser = await this.userRepo.findOne(
+        {
+          username: targetUsername,
+        },
+        { select: ['followings', 'id'] },
+      );
       if (!targetUser) {
         return { ok: false, error: 'User not found.' };
       }
-      if (user?.id === targetUserId) {
+      if (user?.id === targetUser.id) {
         // Reading user's own trips. (private)
         availability = 0;
       } else if (targetUser.followings?.includes(user)) {

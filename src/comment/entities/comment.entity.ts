@@ -35,7 +35,7 @@ export class Comment {
 
   // user
   @Field(() => Users)
-  @ManyToOne(() => Users, (user) => user.comments)
+  @ManyToOne(() => Users, (user) => user.comments, { onDelete: 'CASCADE' })
   creator: Users;
 
   @RelationId((comment: Comment) => comment.creator)
@@ -43,7 +43,7 @@ export class Comment {
 
   // step
   @Field(() => Step)
-  @ManyToOne(() => Step, (step) => step.comments)
+  @ManyToOne(() => Step, (step) => step.comments, { onDelete: 'CASCADE' })
   step: Step;
 
   @RelationId((comment: Comment) => comment.step)

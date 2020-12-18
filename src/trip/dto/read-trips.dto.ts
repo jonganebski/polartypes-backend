@@ -1,10 +1,10 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Trip } from '../entities/trip.entity';
 
 @InputType()
 export class ReadTripsInput {
-  @Field(() => Int)
-  targetUserId: number;
+  @Field(() => String)
+  targetUsername: string;
 }
 
 @ObjectType()

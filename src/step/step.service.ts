@@ -51,12 +51,12 @@ export class StepService {
       if (!targetUser) {
         return { ok: false, error: 'User not found.' };
       }
-      const isPrivate = Boolean(user?.id === trip.travelerId);
-      const isPublic = Boolean(trip.availability === 2);
-      const isFollower = Boolean(
+      const isSelf = Boolean(user?.id === trip.travelerId);
+      const isPublicAllowed = Boolean(trip.availability === 2);
+      const isFollowersAllowedAndIsFollower = Boolean(
         targetUser.followers?.includes(user) && trip.availability === 1,
       );
-      if (isPrivate || isPublic || isFollower) {
+      if (isSelf || isPublicAllowed || isFollowersAllowedAndIsFollower) {
         return { ok: true, steps: trip.steps };
       } else {
         return { ok: false, error: 'You are not authorized.' };

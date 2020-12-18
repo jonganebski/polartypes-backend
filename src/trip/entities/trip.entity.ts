@@ -73,7 +73,7 @@ export class Trip {
 
   // creator
   @Field(() => Users)
-  @ManyToOne(() => Users, (user) => user.trips)
+  @ManyToOne(() => Users, (user) => user.trips, { onDelete: 'CASCADE' })
   traveler: Users;
 
   @RelationId((trip: Trip) => trip.traveler)

@@ -6,7 +6,17 @@ import {
   CreateAccountInput,
   CreateAccountOutput,
 } from './dto/create-account.dto';
+import { FollowInput, FollowOutput } from './dto/follow.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
+import {
+  ReadFollowersInput,
+  ReadFollowersOutput,
+} from './dto/read-followers.dto';
+import {
+  ReadFollowingsInput,
+  ReadFollowingsOutput,
+} from './dto/read-followings.dto';
+import { UnfollowInput, UnfollowOutput } from './dto/unfollow.dto';
 import { Users } from './entities/user.entity';
 
 @Injectable()
@@ -45,8 +55,6 @@ export class UserService {
           firstName,
           lastName,
           username,
-          followers: [],
-          followings: [],
         }),
       );
       return { ok: true };
@@ -87,6 +95,84 @@ export class UserService {
       return { user, error: null };
     } catch {
       return { user: null, error: 'Failed to find a user.' };
+    }
+  }
+
+  async follow(user: Users, { id }: FollowInput): Promise<FollowOutput> {
+    try {
+      const targetUser = await this.userRepo.findOne(id, {
+        relations: ['followers'],
+      });
+      if (!targetUser) {
+        return { ok: false, error: 'User not found.' };
+      }
+      if (!targetUser.followers) {
+        targetUser.followers = [user];
+      } else {
+        targetUser.followers = [...targetUser.followers, user];
+      }
+      await this.userRepo.save([
+        { id, ...targetUser, followers: targetUser.followers },
+      ]);
+      return { ok: true };
+    } catch (err) {
+      console.log(err);
+      return { ok: false, error: 'Failed to follow.' };
+    }
+  }
+
+  async unfollow(user: Users, { id }: UnfollowInput): Promise<UnfollowOutput> {
+    try {
+      const targetUser = await this.userRepo.findOne(
+        { id },
+        { relations: ['followers'] },
+      );
+      if (!targetUser) {
+        return { ok: false, error: 'User not found.' };
+      }
+      targetUser.followers = targetUser.followers.filter(
+        (follower) => follower.id !== user.id,
+      );
+      await this.userRepo.save([
+        { id, ...targetUser, followers: targetUser.followers },
+      ]);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Failed to unfollow.' };
+    }
+  }
+
+  async readFollowers({
+    targetUserId,
+  }: ReadFollowersInput): Promise<ReadFollowersOutput> {
+    try {
+      const targetUser = await this.userRepo.findOne({
+        where: { id: targetUserId },
+        relations: ['followers'],
+      });
+      if (!targetUser) {
+        return { ok: false, error: 'User not found.' };
+      }
+      return { ok: true, followers: targetUser.followers };
+    } catch {
+      return { ok: false, error: 'Failed to load followers.' };
+    }
+  }
+
+  async readFollowings({
+    targetUserId,
+  }: ReadFollowingsInput): Promise<ReadFollowingsOutput> {
+    try {
+      const targetUser = await this.userRepo.findOne({
+        where: { id: targetUserId },
+        relations: ['followings'],
+      });
+      if (!targetUser) {
+        return { ok: false, error: 'User not found.' };
+      }
+      return { ok: true, followings: targetUser.followings };
+    } catch {
+      return { ok: false, error: 'Failed to load followings.' };
     }
   }
 }

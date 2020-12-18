@@ -74,7 +74,7 @@ export class Step {
 
   // user
   @Field(() => Users)
-  @ManyToOne(() => Users, (user) => user.steps)
+  @ManyToOne(() => Users, (user) => user.steps, { onDelete: 'CASCADE' })
   traveler: Users;
 
   @RelationId((step: Step) => step.traveler)
@@ -82,7 +82,7 @@ export class Step {
 
   // trip
   @Field(() => Trip)
-  @ManyToOne(() => Trip, (trip) => trip.steps)
+  @ManyToOne(() => Trip, (trip) => trip.steps, { onDelete: 'CASCADE' })
   trip: Trip;
 
   @RelationId((step: Step) => step.trip)
