@@ -13,6 +13,7 @@ import {
   RelationId,
   UpdateDateColumn,
 } from 'typeorm';
+import { Image } from './image.entity';
 import { Like } from './like.entity';
 
 @InputType('StepInputType', { isAbstract: true })
@@ -61,15 +62,15 @@ export class Step {
   @IsString()
   story?: string;
 
-  @Field(() => [String])
-  @Column({ type: 'text', array: true })
-  @IsArray()
-  photoUrls: string[];
-
   // likes
   @Field(() => [Like])
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
+
+  // images
+  @Field(() => [Image])
+  @OneToMany(() => Image, (image) => image.step)
+  images: Image[];
 
   // comments
   @Field(() => [Comment])

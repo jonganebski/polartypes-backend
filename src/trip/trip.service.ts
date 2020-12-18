@@ -144,6 +144,7 @@ export class TripService {
       if (trip.travelerId !== user.id) {
         return { ok: false, error: 'Not authorized.' };
       }
+      // request delete images to aws s3.
       console.log('Delete trip under development.');
       return { ok: true, error: 'Not deleted. Delete trip under development.' };
     } catch {

@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { CreateImageInput, CreateImageOutput } from './dto/create-image.dto';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
+import { DeleteImagesInput, DeleteImagesOutput } from './dto/delete-images.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dto/toggle-like.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
+import { Image } from './entities/image.entity';
 import { Like } from './entities/like.entity';
 import { Step } from './entities/step.entity';
 
@@ -15,7 +18,6 @@ export class StepService {
   constructor(
     @InjectRepository(Step) private readonly stepRepo: Repository<Step>,
     @InjectRepository(Trip) private readonly tripRepo: Repository<Trip>,
-    @InjectRepository(Users) private readonly userRepo: Repository<Users>,
   ) {}
 
   async createStep(
@@ -55,28 +57,6 @@ export class StepService {
     }
   }
 
-  // async likeStep(
-  //   user: Users,
-  //   { id: stepId }: ToggleLikeInput,
-  // ): Promise<ToggleLikeOutput> {
-  //   try {
-  // const step = await this.stepRepo.findOne(id, {
-  //   relations: ['likedUsers'],
-  // });
-  // console.log(step.likedUsers);
-  // if (!step) {
-  //   return { ok: false, error: 'Step not found.' };
-  // }
-  // await this.stepRepo.save([
-  //   { id, likedUsers: [...step.likedUsers, user] },
-  // ]);
-  // return { ok: true };
-  //   } catch (err) {
-  //     console.log(err);
-  //     return { ok: false, error: 'Failed to like this step.' };
-  //   }
-  // }
-
   async deleteStep(
     user: Users,
     { stepId }: DeleteStepInput,
@@ -89,6 +69,7 @@ export class StepService {
       if (step.travelerId !== user.id) {
         return { ok: false, error: 'You are not authorized.' };
       }
+      // request delete images to aws s3.
       return { ok: true, error: "Not deleted. It's under development." };
     } catch {
       return { ok: false, error: 'Failed to delete step.' };
@@ -100,7 +81,6 @@ export class StepService {
 export class LikeService {
   constructor(
     @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
-    @InjectRepository(Step) private readonly stepRepo: Repository<Step>,
   ) {}
 
   async toggleLike(
@@ -122,6 +102,59 @@ export class LikeService {
       }
     } catch {
       return { ok: false, error: 'Failed to toggle like.' };
+    }
+  }
+}
+
+@Injectable()
+export class ImageService {
+  constructor(
+    @InjectRepository(Image) private readonly imageRepo: Repository<Image>,
+    @InjectRepository(Step) private readonly stepRepo: Repository<Step>,
+  ) {}
+
+  async createImage({
+    stepId,
+    url,
+  }: CreateImageInput): Promise<CreateImageOutput> {
+    try {
+      const step = await this.stepRepo.findOne({ id: stepId });
+      if (!step) {
+        return { ok: false, error: 'Step not found.' };
+      }
+      const image = await this.imageRepo.create({ url, step });
+      await this.imageRepo.save(image);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Failed to create image.' };
+    }
+  }
+
+  async deleteImage(
+    user: Users,
+    { stepId, imageIds }: DeleteImagesInput,
+  ): Promise<DeleteImagesOutput> {
+    try {
+      const step = await this.stepRepo.findOne({ id: stepId });
+      if (!step) {
+        return { ok: false, error: 'Step not found.' };
+      }
+      if (step.travelerId !== user.id) {
+        return { ok: false, error: 'You are not authorized.' };
+      }
+      const images = await this.imageRepo.find({ id: In(imageIds) });
+      if (images.length === 0 || images.length !== imageIds.length) {
+        return { ok: false, error: 'Images not found.' };
+      }
+      if (images.some((image) => image.stepId !== stepId)) {
+        return { ok: false, error: "Some images don't belong to this step." };
+      }
+      // delete request to aws s3
+      //
+      // await this.imageRepo.delete({ id: In(imageIds) });
+      return { ok: true, error: "Not deleted. It's under development." };
+    } catch {
+      return { ok: false, error: 'Failed to delete images.' };
     }
   }
 }

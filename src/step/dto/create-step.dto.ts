@@ -4,7 +4,6 @@ import { Step } from '../entities/step.entity';
 @InputType()
 export class CreateStepInput extends PickType(Step, [
   'name',
-  'photoUrls',
   'country',
   'coord',
   'arrivedAt',

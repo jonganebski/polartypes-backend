@@ -202,4 +202,6 @@ export class UserService {
       return { ok: false, error: 'Failed to load followings.' };
     }
   }
+
+  // request delete images to aws s3.
 }

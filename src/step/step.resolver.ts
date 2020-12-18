@@ -3,11 +3,13 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
+import { CreateImageInput, CreateImageOutput } from './dto/create-image.dto';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
+import { DeleteImagesOutput, DeleteImagesInput } from './dto/delete-images.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dto/toggle-like.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
-import { LikeService, StepService } from './step.service';
+import { ImageService, LikeService, StepService } from './step.service';
 
 @Resolver()
 export class StepResolver {
@@ -31,15 +33,6 @@ export class StepResolver {
     return this.stepService.updateStep(user, updateStepInput);
   }
 
-  // @UseGuards(AuthGuard)
-  // @Mutation(() => ToggleLikeOutput)
-  // likeStep(
-  //   @AuthUser() user: Users,
-  //   @Args('input') toggleLikeInput: ToggleLikeInput,
-  // ): Promise<ToggleLikeOutput> {
-  //   return this.stepService.likeStep(user, toggleLikeInput);
-  // }
-
   @UseGuards(AuthGuard)
   @Mutation(() => DeleteStepOutput)
   deleteStep(
@@ -61,5 +54,27 @@ export class LikeResolver {
     @Args('input') toggleLikeInput: ToggleLikeInput,
   ): Promise<ToggleLikeOutput> {
     return this.likeService.toggleLike(user, toggleLikeInput);
+  }
+}
+
+@Resolver()
+export class ImageResolver {
+  constructor(private readonly imageService: ImageService) {}
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => CreateImageOutput)
+  createImage(
+    @Args('input') createImageInput: CreateImageInput,
+  ): Promise<CreateImageOutput> {
+    return this.imageService.createImage(createImageInput);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => DeleteImagesOutput)
+  deleteImage(
+    @AuthUser() user: Users,
+    @Args('input') deleteImagesInput: DeleteImagesInput,
+  ): Promise<DeleteImagesOutput> {
+    return this.imageService.deleteImage(user, deleteImagesInput);
   }
 }
