@@ -1,20 +1,20 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { Step } from '../entities/step.entity';
+import { Comment } from '../entities/comment.entity';
 
 @InputType()
-export class ReadStepsInput {
+export class ReadCommentsInput {
   @Field(() => Int)
-  tripId: number;
+  stepId: number;
 }
 
 @ObjectType()
-export class ReadStepsOutput {
+export class ReadCommentsOutput {
   @Field(() => Boolean)
   ok: boolean;
 
   @Field(() => String, { nullable: true })
   error?: string;
 
-  @Field(() => [Step], { nullable: true })
-  steps?: Step[];
+  @Field(() => [Comment], { nullable: true })
+  comments?: Comment[];
 }

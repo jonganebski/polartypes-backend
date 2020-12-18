@@ -123,4 +123,7 @@ export class Users {
   comments: Comment[];
 
   // likes
+  @Field(() => [Step])
+  @ManyToMany(() => Step, (step) => step.likedUsers)
+  likedSteps: Step[];
 }

@@ -11,6 +11,7 @@ import {
   DeleteCommentInput,
   DeleteCommentOutput,
 } from './dto/delete-comment.dto';
+import { ReadCommentsInput, ReadCommentsOutput } from './dto/read-comments.dto';
 import { Comment } from './entities/comment.entity';
 
 @Injectable()
@@ -39,6 +40,24 @@ export class CommentService {
       return { ok: true };
     } catch {
       return { ok: false, error: 'Failed to create comment.' };
+    }
+  }
+
+  async readComments({
+    stepId,
+  }: ReadCommentsInput): Promise<ReadCommentsOutput> {
+    try {
+      const step = await this.stepRepo.findOne(
+        { id: stepId },
+        { relations: ['comments', 'comments.creator'] },
+      );
+      if (!step) {
+        return { ok: false, error: 'Step not found.' };
+      }
+      return { ok: true, comments: step.comments };
+    } catch (err) {
+      console.log(err);
+      return { ok: false, error: 'Failed to load comments.' };
     }
   }
 

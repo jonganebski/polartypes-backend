@@ -7,6 +7,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -66,6 +68,10 @@ export class Step {
   photoUrls: string[];
 
   // liked users
+  @Field(() => [Users])
+  @ManyToMany(() => Users, (user) => user.likedSteps, { cascade: true })
+  @JoinTable()
+  likedUsers: Users[];
 
   // cooments
   @Field(() => [Comment])

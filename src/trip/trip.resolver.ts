@@ -5,6 +5,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
 import { DeleteTripInput, DeleteTripOutput } from './dto/delete-trip.dto';
+import { ReadTripInput, ReadTripOutput } from './dto/read-trip.dto';
 import { ReadTripsInput, ReadTripsOutput } from './dto/read-trips.dto';
 import { UpdateTripInput, UpdateTripOutput } from './dto/update-trip.dto';
 import { TripService } from './trip.service';
@@ -28,6 +29,14 @@ export class TripResolver {
     @Args('input') readTripsInput: ReadTripsInput,
   ): Promise<ReadTripsOutput> {
     return this.tripService.readTrips(user, readTripsInput);
+  }
+
+  @Query(() => ReadTripOutput)
+  readTrip(
+    @AuthUser() user: Users,
+    @Args('input') readTripInput: ReadTripInput,
+  ) {
+    return this.tripService.readTrip(user, readTripInput);
   }
 
   @UseGuards(AuthGuard)

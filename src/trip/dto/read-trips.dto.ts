@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { Trip } from '../entities/trip.entity';
+import { Users } from 'src/users/entities/user.entity';
 
 @InputType()
 export class ReadTripsInput {
@@ -15,6 +15,6 @@ export class ReadTripsOutput {
   @Field(() => String, { nullable: true })
   error?: string;
 
-  @Field(() => [Trip], { nullable: true })
-  trips?: Trip[];
+  @Field(() => Users, { nullable: true })
+  targetUser?: Users;
 }

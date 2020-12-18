@@ -8,6 +8,7 @@ export class CreateStepInput extends PickType(Step, [
   'country',
   'coord',
   'arrivedAt',
+  'timeZone',
 ]) {
   @Field(() => Int)
   tripId: number;

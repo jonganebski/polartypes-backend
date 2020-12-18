@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/users/entities/user.entity';
-import { UserService } from 'src/users/user.service';
 import { Repository } from 'typeorm';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
 import { DeleteTripInput, DeleteTripOutput } from './dto/delete-trip.dto';
+import { ReadTripInput, ReadTripOutput } from './dto/read-trip.dto';
 import { ReadTripsInput, ReadTripsOutput } from './dto/read-trips.dto';
 import { UpdateTripInput, UpdateTripOutput } from './dto/update-trip.dto';
 import { Trip } from './entities/trip.entity';
@@ -40,28 +40,73 @@ export class TripService {
         {
           username: targetUsername,
         },
-        { select: ['followings', 'id'] },
+        { relations: ['trips', 'followers'] },
       );
       if (!targetUser) {
         return { ok: false, error: 'User not found.' };
       }
-      if (user?.id === targetUser.id) {
+      const isSelf = Boolean(user?.id === targetUser.id);
+      const isFollower = Boolean(
+        targetUser.followers?.some((follower) => follower.id === user?.id),
+      );
+      if (isSelf) {
         // Reading user's own trips. (private)
-        availability = 0;
-      } else if (targetUser.followings?.includes(user)) {
+        return { ok: true, targetUser };
+      }
+      if (isFollower) {
         // Reading follower's trip. (followers)
         availability = 1;
       } else {
         // Reading somebody's trip. (public)
         availability = 2;
       }
-      const trips = await this.tripRepo.find({
-        traveler: targetUser,
-        availability,
-      });
-      return { ok: true, trips };
-    } catch {
+      targetUser.trips = targetUser.trips.filter(
+        (trip) => trip.availability === availability,
+      );
+      return { ok: true, targetUser };
+    } catch (err) {
+      console.log(err);
       return { ok: false, error: 'Failed to load trips.' };
+    }
+  }
+
+  async readTrip(
+    user: Users,
+    { tripId }: ReadTripInput,
+  ): Promise<ReadTripOutput> {
+    try {
+      const trip = await this.tripRepo.findOne(
+        {
+          id: tripId,
+        },
+        {
+          relations: ['steps', 'steps.likedUsers', 'traveler'],
+        },
+      );
+      if (!trip) {
+        return { ok: false, error: 'Trip not found.' };
+      }
+      const targetUser = await this.userRepo.findOne(
+        { id: trip.travelerId },
+        { relations: ['followers'] },
+      );
+      if (!targetUser) {
+        return { ok: false, error: 'User not found.' };
+      }
+      const isSelf = Boolean(user?.id === trip.travelerId);
+      const isPublicAllowed = Boolean(trip.availability === 2);
+      const isFollowersAllowedAndIsFollower = Boolean(
+        targetUser.followers?.some((follower) => follower.id === user?.id) &&
+          trip.availability === 1,
+      );
+      if (isSelf || isPublicAllowed || isFollowersAllowedAndIsFollower) {
+        return { ok: true, trip };
+      } else {
+        return { ok: false, error: 'You are not authorized.' };
+      }
+    } catch (err) {
+      console.log(err);
+      return { ok: false, error: 'Failed to load steps.' };
     }
   }
 

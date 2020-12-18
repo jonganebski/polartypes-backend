@@ -5,7 +5,7 @@ import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
-import { ReadStepsInput, ReadStepsOutput } from './dto/read-steps.dto';
+import { LikeStepInput, LikeStepOutput } from './dto/like-step.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
 import { Step } from './entities/step.entity';
 
@@ -33,40 +33,6 @@ export class StepService {
     }
   }
 
-  async readSteps(
-    user: Users,
-    { tripId }: ReadStepsInput,
-  ): Promise<ReadStepsOutput> {
-    try {
-      const trip = await this.tripRepo.findOne(
-        {
-          id: tripId,
-        },
-        { relations: ['steps', 'steps.comments', 'steps.comments.creator'] },
-      );
-      if (!trip) {
-        return { ok: false, error: 'Trip not found.' };
-      }
-      const targetUser = await this.userRepo.findOne({ id: trip.travelerId });
-      if (!targetUser) {
-        return { ok: false, error: 'User not found.' };
-      }
-      const isSelf = Boolean(user?.id === trip.travelerId);
-      const isPublicAllowed = Boolean(trip.availability === 2);
-      const isFollowersAllowedAndIsFollower = Boolean(
-        targetUser.followers?.includes(user) && trip.availability === 1,
-      );
-      if (isSelf || isPublicAllowed || isFollowersAllowedAndIsFollower) {
-        return { ok: true, steps: trip.steps };
-      } else {
-        return { ok: false, error: 'You are not authorized.' };
-      }
-    } catch (err) {
-      console.log(err);
-      return { ok: false, error: 'Failed to load steps.' };
-    }
-  }
-
   async updateStep(
     user: Users,
     updateStepInput: UpdateStepInput,
@@ -85,6 +51,25 @@ export class StepService {
       return { ok: true };
     } catch {
       return { ok: false, error: 'Failed to update step.' };
+    }
+  }
+
+  async likeStep(user: Users, { id }: LikeStepInput): Promise<LikeStepOutput> {
+    try {
+      const step = await this.stepRepo.findOne(id, {
+        relations: ['likedUsers'],
+      });
+      console.log(step.likedUsers);
+      if (!step) {
+        return { ok: false, error: 'Step not found.' };
+      }
+      await this.stepRepo.save([
+        { id, likedUsers: [...step.likedUsers, user] },
+      ]);
+      return { ok: true };
+    } catch (err) {
+      console.log(err);
+      return { ok: false, error: 'Failed to like this step.' };
     }
   }
 

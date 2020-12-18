@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
@@ -12,6 +12,7 @@ import {
   DeleteCommentInput,
   DeleteCommentOutput,
 } from './dto/delete-comment.dto';
+import { ReadCommentsInput, ReadCommentsOutput } from './dto/read-comments.dto';
 
 @Resolver()
 export class CommentResolver {
@@ -24,6 +25,13 @@ export class CommentResolver {
     @Args('input') createCommentInput: CreateCommentInput,
   ): Promise<CreateCommentOutput> {
     return this.commentService.createComment(user, createCommentInput);
+  }
+
+  @Query(() => ReadCommentsOutput)
+  readComments(
+    @Args('input') readCommentsInput: ReadCommentsInput,
+  ): Promise<ReadCommentsOutput> {
+    return this.commentService.readComments(readCommentsInput);
   }
 
   @UseGuards(AuthGuard)

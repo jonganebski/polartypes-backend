@@ -1,11 +1,11 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
-import { ReadStepsInput, ReadStepsOutput } from './dto/read-steps.dto';
+import { LikeStepInput, LikeStepOutput } from './dto/like-step.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
 import { StepService } from './step.service';
 
@@ -22,14 +22,6 @@ export class StepResolver {
     return this.stepService.createStep(user, createStepInput);
   }
 
-  @Query(() => ReadStepsOutput)
-  readSteps(
-    @AuthUser() user: Users,
-    @Args('input') readStepsInput: ReadStepsInput,
-  ): Promise<ReadStepsOutput> {
-    return this.stepService.readSteps(user, readStepsInput);
-  }
-
   @UseGuards(AuthGuard)
   @Mutation(() => UpdateStepOutput)
   updateStep(
@@ -37,6 +29,15 @@ export class StepResolver {
     @Args('input') updateStepInput: UpdateStepInput,
   ): Promise<UpdateStepOutput> {
     return this.stepService.updateStep(user, updateStepInput);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => LikeStepOutput)
+  likeStep(
+    @AuthUser() user: Users,
+    @Args('input') likeStepInput: LikeStepInput,
+  ): Promise<LikeStepOutput> {
+    return this.stepService.likeStep(user, likeStepInput);
   }
 
   @UseGuards(AuthGuard)
