@@ -16,6 +16,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Step } from 'src/step/entities/step.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { Like } from 'src/step/entities/like.entity';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -106,7 +107,6 @@ export class Users {
   steps: Step[];
 
   // followers
-
   @Field(() => [Users])
   @ManyToMany(() => Users, (user) => user.followings)
   @JoinTable()
@@ -123,7 +123,7 @@ export class Users {
   comments: Comment[];
 
   // likes
-  @Field(() => [Step])
-  @ManyToMany(() => Step, (step) => step.likedUsers)
-  likedSteps: Step[];
+  @Field(() => [Like])
+  @OneToMany(() => Like, (like) => like.step)
+  likes: Like[];
 }

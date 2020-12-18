@@ -2,10 +2,10 @@ import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 import { Step } from '../entities/step.entity';
 
 @InputType()
-export class LikeStepInput extends PickType(Step, ['id']) {}
+export class ToggleLikeInput extends PickType(Step, ['id']) {}
 
 @ObjectType()
-export class LikeStepOutput {
+export class ToggleLikeOutput {
   @Field(() => Boolean)
   ok: boolean;
 

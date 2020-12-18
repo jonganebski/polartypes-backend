@@ -25,7 +25,8 @@ export class TripService {
       newTrip.traveler = user;
       await this.tripRepo.save(newTrip);
       return { ok: true };
-    } catch {
+    } catch (err) {
+      console.log(err);
       return { ok: false, error: 'Failed to create trip.' };
     }
   }
@@ -80,7 +81,7 @@ export class TripService {
           id: tripId,
         },
         {
-          relations: ['steps', 'steps.likedUsers', 'traveler'],
+          relations: ['steps', 'steps.likes', 'steps.likes.user', 'traveler'],
         },
       );
       if (!trip) {

@@ -5,9 +5,9 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
-import { LikeStepInput, LikeStepOutput } from './dto/like-step.dto';
+import { ToggleLikeInput, ToggleLikeOutput } from './dto/toggle-like.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
-import { StepService } from './step.service';
+import { LikeService, StepService } from './step.service';
 
 @Resolver()
 export class StepResolver {
@@ -31,14 +31,14 @@ export class StepResolver {
     return this.stepService.updateStep(user, updateStepInput);
   }
 
-  @UseGuards(AuthGuard)
-  @Mutation(() => LikeStepOutput)
-  likeStep(
-    @AuthUser() user: Users,
-    @Args('input') likeStepInput: LikeStepInput,
-  ): Promise<LikeStepOutput> {
-    return this.stepService.likeStep(user, likeStepInput);
-  }
+  // @UseGuards(AuthGuard)
+  // @Mutation(() => ToggleLikeOutput)
+  // likeStep(
+  //   @AuthUser() user: Users,
+  //   @Args('input') toggleLikeInput: ToggleLikeInput,
+  // ): Promise<ToggleLikeOutput> {
+  //   return this.stepService.likeStep(user, toggleLikeInput);
+  // }
 
   @UseGuards(AuthGuard)
   @Mutation(() => DeleteStepOutput)
@@ -47,5 +47,19 @@ export class StepResolver {
     @Args('input') deleteStepInput: DeleteStepInput,
   ): Promise<DeleteStepOutput> {
     return this.stepService.deleteStep(user, deleteStepInput);
+  }
+}
+
+@Resolver()
+export class LikeResolver {
+  constructor(private readonly likeService: LikeService) {}
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => ToggleLikeOutput)
+  toggleLike(
+    @AuthUser() user: Users,
+    @Args('input') toggleLikeInput: ToggleLikeInput,
+  ): Promise<ToggleLikeOutput> {
+    return this.likeService.toggleLike(user, toggleLikeInput);
   }
 }

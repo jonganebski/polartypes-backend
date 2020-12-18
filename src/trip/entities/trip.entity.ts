@@ -1,10 +1,11 @@
 import {
   Field,
   InputType,
+  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsDate, IsString, IsUrl } from 'class-validator';
+import { IsDate, IsNumber, IsString, IsUrl } from 'class-validator';
 import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
 import {
@@ -70,6 +71,11 @@ export class Trip {
   @Field(() => Availability)
   @Column({ type: 'enum', enum: Availability })
   availability: Availability;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @Column({ default: 0 })
+  @IsNumber()
+  views: number;
 
   // creator
   @Field(() => Users)

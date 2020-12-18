@@ -14,6 +14,7 @@ import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/entities/comment.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { JwtModule } from './jwt/jwt.module';
+import { Like } from './step/entities/like.entity';
 import { Step } from './step/entities/step.entity';
 import { StepModule } from './step/step.module';
 import { Trip } from './trip/entities/trip.entity';
@@ -51,7 +52,7 @@ import { UsersModule } from './users/user.module';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [Users, Trip, Step, Comment], // typeORM will only take care of these entities.
+      entities: [Users, Trip, Step, Comment, Like], // typeORM will only take care of these entities.
     }),
     UsersModule,
     TripsModule,

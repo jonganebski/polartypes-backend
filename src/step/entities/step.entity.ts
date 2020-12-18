@@ -7,14 +7,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
 } from 'typeorm';
+import { Like } from './like.entity';
 
 @InputType('StepInputType', { isAbstract: true })
 @ObjectType()
@@ -67,13 +66,12 @@ export class Step {
   @IsArray()
   photoUrls: string[];
 
-  // liked users
-  @Field(() => [Users])
-  @ManyToMany(() => Users, (user) => user.likedSteps, { cascade: true })
-  @JoinTable()
-  likedUsers: Users[];
+  // likes
+  @Field(() => [Like])
+  @OneToMany(() => Like, (like) => like.user)
+  likes: Like[];
 
-  // cooments
+  // comments
   @Field(() => [Comment])
   @OneToMany(() => Comment, (comment) => comment.step)
   comments: Comment[];
