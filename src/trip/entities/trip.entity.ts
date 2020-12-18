@@ -1,11 +1,10 @@
 import {
   Field,
   InputType,
-  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsNumber, IsString, IsUrl } from 'class-validator';
+import { IsDate, IsString, IsUrl } from 'class-validator';
 import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
 import {
@@ -43,15 +42,15 @@ export class Trip {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Field(() => Int)
+  @Field(() => Date)
   @Column()
-  @IsNumber()
-  startUnix: number; // unix in seconds.
+  @IsDate()
+  startDate: Date; // unix in seconds.
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column({ nullable: true })
-  @IsNumber()
-  endUnix?: number; // unix in seconds.
+  @IsDate()
+  endDate?: Date; // unix in seconds.
 
   @Field(() => String)
   @Column()

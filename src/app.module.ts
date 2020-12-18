@@ -11,6 +11,7 @@ import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CommentModule } from './comment/comment.module';
+import { Comment } from './comment/entities/comment.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { JwtModule } from './jwt/jwt.module';
 import { Step } from './step/entities/step.entity';
@@ -50,7 +51,7 @@ import { UsersModule } from './users/user.module';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [Users, Trip, Step], // typeORM will only take care of these entities.
+      entities: [Users, Trip, Step, Comment], // typeORM will only take care of these entities.
     }),
     UsersModule,
     TripsModule,

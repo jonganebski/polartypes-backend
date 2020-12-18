@@ -13,6 +13,7 @@ import * as argon2 from 'argon2';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Step } from 'src/step/entities/step.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -112,7 +113,11 @@ export class Users {
   @Field(() => [Users])
   @OneToMany(() => Users, (user) => user.followers)
   followings: Users[];
+
   // comments
+  @Field(() => [Comment])
+  @OneToMany(() => Comment, (comment) => comment.creator)
+  comments: Comment[];
 
   // likes
 }

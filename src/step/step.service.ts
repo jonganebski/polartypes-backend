@@ -42,7 +42,7 @@ export class StepService {
         {
           id: tripId,
         },
-        { relations: ['steps'] },
+        { relations: ['steps', 'steps.comments', 'steps.comments.creator'] },
       );
       if (!trip) {
         return { ok: false, error: 'Trip not found.' };

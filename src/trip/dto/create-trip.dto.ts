@@ -4,7 +4,7 @@ import { Trip } from '../entities/trip.entity';
 @InputType()
 export class CreateTripInput extends PickType(Trip, [
   'name',
-  'startUnix',
+  'startDate',
   'availability',
 ]) {
   @Field(() => String, { nullable: true })

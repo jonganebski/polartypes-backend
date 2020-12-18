@@ -1,5 +1,6 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { IsArray, IsDate, IsString } from 'class-validator';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
 import {
@@ -7,6 +8,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
@@ -43,10 +45,15 @@ export class Step {
   @IsString()
   name: string;
 
-  @Field(() => Int)
+  @Field(() => Date)
   @Column()
-  @IsNumber()
-  arrivedAt: number;
+  @IsDate()
+  arrivedAt: Date;
+
+  @Field(() => String)
+  @Column()
+  @IsString()
+  timeZone: string;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
@@ -61,6 +68,9 @@ export class Step {
   // liked users
 
   // cooments
+  @Field(() => [Comment])
+  @OneToMany(() => Comment, (comment) => comment.step)
+  comments: Comment[];
 
   // user
   @Field(() => Users)
