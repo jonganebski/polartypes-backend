@@ -41,14 +41,26 @@ export class UserService {
       if (existUser) {
         return { ok: false, error: 'Email already exists.' };
       }
-      let username = firstName + lastName;
+      const sanitizedFirstName = firstName.replace(/[^a-zA-Z0-9]+/g, '');
+      const sanitizedLastName = lastName.replace(/[^a-zA-Z0-9]+/g, '');
+      if (!sanitizedFirstName || !sanitizedLastName) {
+        return {
+          ok: false,
+          error: 'First and last name only accetps english and number.',
+        };
+      }
+      let username = sanitizedFirstName + sanitizedLastName;
+      let slug = username.toLowerCase();
       let count = 0;
       while (true) {
-        const existUser = await this.userRepo.findOne({ username });
+        const existUser = await this.userRepo.findOne({ slug });
         if (existUser) {
           ++count;
-          username = firstName + lastName + count + '';
+          slug = slug + count + '';
         } else {
+          if (count !== 0) {
+            username = username + count + '';
+          }
           break;
         }
       }
@@ -56,9 +68,10 @@ export class UserService {
         this.userRepo.create({
           email,
           password,
-          firstName,
-          lastName,
+          firstName: sanitizedFirstName,
+          lastName: sanitizedLastName,
           username,
+          slug,
         }),
       );
       return { ok: true };

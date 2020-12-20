@@ -53,6 +53,11 @@ export class Users extends CoreEntity {
   username: string;
 
   @Field(() => String)
+  @Column({ unique: true })
+  @IsString()
+  slug: string;
+
+  @Field(() => String)
   @Column({ select: false })
   @IsString()
   password: string;
