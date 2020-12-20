@@ -1,10 +1,12 @@
-import { Field, InputType, Int, ObjectType, PickType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { IsNumber } from 'class-validator';
 import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Comment } from '../entities/comment.entity';
 
 @InputType()
 export class CreateCommentInput extends PickType(Comment, ['text']) {
-  @Field(() => Int)
+  @Field(() => Number)
+  @IsNumber()
   stepId: number;
 }
 

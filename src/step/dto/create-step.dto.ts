@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType, PickType } from '@nestjs/graphql';
+import { IsNumber, IsString } from 'class-validator';
 import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Step } from '../entities/step.entity';
 
@@ -10,10 +11,12 @@ export class CreateStepInput extends PickType(Step, [
   'arrivedAt',
   'timeZone',
 ]) {
-  @Field(() => Int)
+  @Field(() => Number)
+  @IsNumber()
   tripId: number;
 
   @Field(() => String, { nullable: true })
+  @IsString()
   story?: string;
 }
 

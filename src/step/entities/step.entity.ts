@@ -1,42 +1,23 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsArray, IsDate, IsString } from 'class-validator';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { CoreEntity } from 'src/common/entities/core.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  RelationId,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Image } from './image.entity';
 import { Like } from './like.entity';
 
 @InputType('StepInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class Step {
-  @Field(() => Number)
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Field(() => Date)
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field(() => Date)
-  @UpdateDateColumn()
-  updatedAt: Date;
-
+export class Step extends CoreEntity {
   @Field(() => String)
   @Column()
   @IsString()
   country: string;
 
+  // Coord field needs to be fixed later.
   @Field(() => [Number])
   @Column({ type: 'float', array: true })
   @IsArray()

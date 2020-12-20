@@ -1,27 +1,25 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import * as argon2 from 'argon2';
 import { IsEmail, IsString, IsUrl } from 'class-validator';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { CoreEntity } from 'src/common/entities/core.entity';
+import { Like } from 'src/step/entities/like.entity';
+import { Step } from 'src/step/entities/step.entity';
+import { Trip } from 'src/trip/entities/trip.entity';
 import {
   BeforeInsert,
   Column,
-  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
-import * as argon2 from 'argon2';
-import { InternalServerErrorException } from '@nestjs/common';
-import { Trip } from 'src/trip/entities/trip.entity';
-import { Step } from 'src/step/entities/step.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { Like } from 'src/step/entities/like.entity';
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class Users {
+export class Users extends CoreEntity {
   // This table is named in plural because trying to avoid confusion with postgresql's default user table.
   @BeforeInsert()
   async hashPassword(): Promise<void> {
@@ -43,18 +41,6 @@ export class Users {
       return false;
     }
   }
-
-  @Field(() => Number)
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Field(() => Date)
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field(() => Date)
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @Field(() => String)
   @Column({ unique: true })

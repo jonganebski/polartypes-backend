@@ -1,33 +1,14 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsString } from 'class-validator';
+import { CoreEntity } from 'src/common/entities/core.entity';
 import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  RelationId,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 
 @InputType('CommentInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class Comment {
-  @Field(() => Number)
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Field(() => Date)
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field(() => Date)
-  @UpdateDateColumn()
-  updatedAt: Date;
-
+export class Comment extends CoreEntity {
   @Field(() => String)
   @Column()
   @IsString()

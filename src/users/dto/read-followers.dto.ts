@@ -1,10 +1,12 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { IsNumber } from 'class-validator';
 import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Users } from '../entities/user.entity';
 
 @InputType()
 export class ReadFollowersInput {
-  @Field(() => Int)
+  @Field(() => Number)
+  @IsNumber()
   targetUserId: number;
 }
 

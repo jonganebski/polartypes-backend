@@ -1,27 +1,13 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsUrl } from 'class-validator';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  RelationId,
-} from 'typeorm';
+import { CoreEntity } from 'src/common/entities/core.entity';
+import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 import { Step } from './step.entity';
 
 @InputType('ImageInputType')
 @ObjectType()
 @Entity()
-export class Image {
-  @Field(() => Int)
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Field(() => Date)
-  @CreateDateColumn()
-  createdAt: Date;
-
+export class Image extends CoreEntity {
   @Field(() => String)
   @Column()
   @IsUrl()

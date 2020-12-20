@@ -1,10 +1,12 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { IsNumber } from 'class-validator';
 import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Comment } from '../entities/comment.entity';
 
 @InputType()
 export class ReadCommentsInput {
-  @Field(() => Int)
+  @Field(() => Number)
+  @IsNumber()
   stepId: number;
 }
 

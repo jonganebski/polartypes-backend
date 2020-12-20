@@ -1,12 +1,15 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { IsString, IsUrl } from 'class-validator';
 import { CoreOutput } from 'src/common/dto/common-output.dto';
 
 @InputType()
 export class CreateImageInput {
-  @Field(() => Int)
+  @Field(() => Number)
+  @IsString()
   stepId: number;
 
   @Field(() => String)
+  @IsUrl()
   url: string;
 }
 

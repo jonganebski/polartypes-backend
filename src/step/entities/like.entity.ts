@@ -1,4 +1,4 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsNumber } from 'class-validator';
 import { Users } from 'src/users/entities/user.entity';
 import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
@@ -8,12 +8,12 @@ import { Step } from './step.entity';
 @ObjectType()
 @Entity()
 export class Like {
-  @Field(() => Int)
+  @Field(() => Number)
   @PrimaryColumn()
   @IsNumber()
   userId: number;
 
-  @Field(() => Int)
+  @Field(() => Number)
   @PrimaryColumn()
   @IsNumber()
   stepId: number;

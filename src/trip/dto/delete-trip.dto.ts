@@ -1,9 +1,11 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { IsNumber } from 'class-validator';
 import { CoreOutput } from 'src/common/dto/common-output.dto';
 
 @InputType()
 export class DeleteTripInput {
-  @Field(() => Int)
+  @Field(() => Number)
+  @IsNumber()
   tripId: number;
 }
 

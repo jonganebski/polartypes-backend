@@ -1,23 +1,14 @@
 import {
   Field,
   InputType,
-  Int,
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
 import { IsDate, IsNumber, IsString, IsUrl } from 'class-validator';
+import { CoreEntity } from 'src/common/entities/core.entity';
 import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  RelationId,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 
 export enum Availability {
   Private,
@@ -30,28 +21,16 @@ registerEnumType(Availability, { name: 'Availability' });
 @InputType('TripInputType', { isAbstract: true })
 @ObjectType() // 자동으로 스키마를 빌드하기 위한 GraphQL decorator
 @Entity() // TypeORM이 database에 저장할 수 있도록 하는 decorator
-export class Trip {
-  @Field(() => Number) // Field fot graphql schema
-  @PrimaryGeneratedColumn() // column for typeORM
-  id: number;
-
-  @Field(() => Date)
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field(() => Date)
-  @UpdateDateColumn()
-  updatedAt: Date;
-
+export class Trip extends CoreEntity {
   @Field(() => Date)
   @Column()
   @IsDate()
-  startDate: Date; // unix in seconds.
+  startDate: Date;
 
   @Field(() => Date, { nullable: true })
   @Column({ nullable: true })
   @IsDate()
-  endDate?: Date; // unix in seconds.
+  endDate?: Date;
 
   @Field(() => String)
   @Column()
@@ -72,7 +51,7 @@ export class Trip {
   @Column({ type: 'enum', enum: Availability })
   availability: Availability;
 
-  @Field(() => Int, { defaultValue: 0 })
+  @Field(() => Number, { defaultValue: 0 })
   @Column({ default: 0 })
   @IsNumber()
   views: number;
