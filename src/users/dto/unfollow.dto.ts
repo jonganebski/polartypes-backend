@@ -1,8 +1,9 @@
-import { InputType, ObjectType } from '@nestjs/graphql';
-import { FollowInput, FollowOutput } from './follow.dto';
+import { InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dto/common-output.dto';
+import { Users } from '../entities/user.entity';
 
 @InputType()
-export class UnfollowInput extends FollowInput {}
+export class UnfollowInput extends PickType(Users, ['id']) {}
 
 @ObjectType()
-export class UnfollowOutput extends FollowOutput {}
+export class UnfollowOutput extends CoreOutput {}

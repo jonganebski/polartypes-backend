@@ -1,5 +1,5 @@
-import { Field, InputType, Int, ObjectType, PickType } from '@nestjs/graphql';
-import { Trip } from '../entities/trip.entity';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dto/common-output.dto';
 
 @InputType()
 export class DeleteTripInput {
@@ -8,10 +8,4 @@ export class DeleteTripInput {
 }
 
 @ObjectType()
-export class DeleteTripOutput {
-  @Field(() => Boolean)
-  ok: boolean;
-
-  @Field(() => String)
-  error: string;
-}
+export class DeleteTripOutput extends CoreOutput {}

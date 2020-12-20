@@ -22,6 +22,7 @@ import { Trip } from './trip/entities/trip.entity';
 import { TripsModule } from './trip/trip.module';
 import { Users } from './users/entities/user.entity';
 import { UsersModule } from './users/user.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { UsersModule } from './users/user.module';
     CommentModule,
     JwtModule,
     StepModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

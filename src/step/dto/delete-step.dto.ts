@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dto/common-output.dto';
 
 @InputType()
 export class DeleteStepInput {
@@ -7,10 +8,4 @@ export class DeleteStepInput {
 }
 
 @ObjectType()
-export class DeleteStepOutput {
-  @Field(() => Boolean)
-  ok: boolean;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
+export class DeleteStepOutput extends CoreOutput {}

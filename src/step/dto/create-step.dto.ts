@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType, PickType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Step } from '../entities/step.entity';
 
 @InputType()
@@ -17,10 +18,4 @@ export class CreateStepInput extends PickType(Step, [
 }
 
 @ObjectType()
-export class CreateStepOutput {
-  @Field(() => Boolean)
-  ok: boolean;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
+export class CreateStepOutput extends CoreOutput {}

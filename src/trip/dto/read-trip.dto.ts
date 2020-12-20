@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Trip } from 'src/trip/entities/trip.entity';
 
 @InputType()
@@ -8,13 +9,7 @@ export class ReadTripInput {
 }
 
 @ObjectType()
-export class ReadTripOutput {
-  @Field(() => Boolean)
-  ok: boolean;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-
+export class ReadTripOutput extends CoreOutput {
   @Field(() => Trip, { nullable: true })
   trip?: Trip;
 }

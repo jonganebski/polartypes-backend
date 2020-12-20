@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Comment } from '../entities/comment.entity';
 
 @InputType()
@@ -8,13 +9,7 @@ export class ReadCommentsInput {
 }
 
 @ObjectType()
-export class ReadCommentsOutput {
-  @Field(() => Boolean)
-  ok: boolean;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-
+export class ReadCommentsOutput extends CoreOutput {
   @Field(() => [Comment], { nullable: true })
   comments?: Comment[];
 }

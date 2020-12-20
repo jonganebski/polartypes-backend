@@ -1,14 +1,9 @@
-import { Field, InputType, ObjectType, PartialType } from '@nestjs/graphql';
+import { InputType, ObjectType, PartialType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Users } from '../entities/user.entity';
 
 @InputType()
 export class UpdateAccountInput extends PartialType(Users) {}
 
 @ObjectType()
-export class UpdateAccountOutput {
-  @Field(() => Boolean)
-  ok: boolean;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
+export class UpdateAccountOutput extends CoreOutput {}
