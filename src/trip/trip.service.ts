@@ -7,7 +7,7 @@ import { DeleteTripInput, DeleteTripOutput } from './dto/delete-trip.dto';
 import { ReadTripInput, ReadTripOutput } from './dto/read-trip.dto';
 import { ReadTripsInput, ReadTripsOutput } from './dto/read-trips.dto';
 import { UpdateTripInput, UpdateTripOutput } from './dto/update-trip.dto';
-import { Trip } from './entities/trip.entity';
+import { Availability, Trip } from './entities/trip.entity';
 
 @Injectable()
 export class TripService {
@@ -23,8 +23,8 @@ export class TripService {
     try {
       const newTrip = this.tripRepo.create(createTripInput);
       newTrip.traveler = user;
-      await this.tripRepo.save(newTrip);
-      return { ok: true };
+      const savedTrip = await this.tripRepo.save(newTrip);
+      return { ok: true, tripId: savedTrip.id };
     } catch (err) {
       console.log(err);
       return { ok: false, error: 'Failed to create trip.' };
@@ -36,12 +36,11 @@ export class TripService {
     { targetUsername }: ReadTripsInput,
   ): Promise<ReadTripsOutput> {
     try {
-      let availability: number;
       const targetUser = await this.userRepo.findOne(
         {
-          username: targetUsername,
+          slug: targetUsername.toLocaleLowerCase(),
         },
-        { relations: ['trips', 'followers'] },
+        { relations: ['trips', 'followers', 'followings'] },
       );
       if (!targetUser) {
         return { ok: false, error: 'User not found.' };
@@ -56,14 +55,15 @@ export class TripService {
       }
       if (isFollower) {
         // Reading follower's trip. (followers)
-        availability = 1;
+        targetUser.trips = targetUser.trips.filter(
+          (trip) => trip.availability !== Availability.Private,
+        );
       } else {
         // Reading somebody's trip. (public)
-        availability = 2;
+        targetUser.trips = targetUser.trips.filter(
+          (trip) => trip.availability === Availability.Public,
+        );
       }
-      targetUser.trips = targetUser.trips.filter(
-        (trip) => trip.availability === availability,
-      );
       return { ok: true, targetUser };
     } catch (err) {
       console.log(err);
@@ -81,7 +81,14 @@ export class TripService {
           id: tripId,
         },
         {
-          relations: ['steps', 'steps.likes', 'steps.likes.user', 'traveler'],
+          relations: [
+            'steps',
+            'steps.likes',
+            'steps.likes.user',
+            'steps.images',
+            'steps.comments',
+            'traveler',
+          ],
         },
       );
       if (!trip) {
@@ -95,10 +102,12 @@ export class TripService {
         return { ok: false, error: 'User not found.' };
       }
       const isSelf = Boolean(user?.id === trip.travelerId);
-      const isPublicAllowed = Boolean(trip.availability === 2);
+      const isPublicAllowed = Boolean(
+        trip.availability === Availability.Public,
+      );
       const isFollowersAllowedAndIsFollower = Boolean(
         targetUser.followers?.some((follower) => follower.id === user?.id) &&
-          trip.availability === 1,
+          trip.availability !== Availability.Private,
       );
       if (isSelf || isPublicAllowed || isFollowersAllowedAndIsFollower) {
         return { ok: true, trip };

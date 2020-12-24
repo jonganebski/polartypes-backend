@@ -72,6 +72,11 @@ export class Users extends CoreEntity {
   @IsString()
   lastName: string;
 
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  @IsString()
+  about?: string;
+
   @Field(() => String, { nullable: true }) // just for now
   @Column({ nullable: true })
   @IsUrl()

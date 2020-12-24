@@ -64,7 +64,7 @@ export class UserService {
           break;
         }
       }
-      await this.userRepo.save(
+      const savedUser = await this.userRepo.save(
         this.userRepo.create({
           email,
           password,
@@ -74,7 +74,8 @@ export class UserService {
           slug,
         }),
       );
-      return { ok: true };
+      const token = this.jwtService.sign(savedUser.id, false);
+      return { ok: true, token, username };
     } catch {
       return { ok: false, error: 'Failed to create account.' };
     }
@@ -103,16 +104,20 @@ export class UserService {
     }
   }
 
-  async login({ usernameOrEmail, password }: LoginInput): Promise<LoginOutput> {
+  async login({
+    usernameOrEmail,
+    password,
+    rememberMe,
+  }: LoginInput): Promise<LoginOutput> {
     try {
       let user = await this.userRepo.findOne(
         { email: usernameOrEmail },
-        { select: ['id', 'password'] },
+        { select: ['id', 'password', 'username'] },
       );
       if (!user) {
         user = await this.userRepo.findOne(
           { username: usernameOrEmail },
-          { select: ['id', 'password'] },
+          { select: ['id', 'password', 'username'] },
         );
         if (!user) {
           return { ok: false, error: 'User does not exist.' };
@@ -122,8 +127,9 @@ export class UserService {
       if (!isMatch) {
         return { ok: false, error: 'Wrong password.' };
       }
-      const token = this.jwtService.sign(user.id);
-      return { ok: true, token };
+      const token = this.jwtService.sign(user.id, rememberMe);
+      console.log(user);
+      return { ok: true, token, username: user.username };
     } catch {
       return { ok: false, error: 'Failed to login.' };
     }

@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { IsDate, IsString } from 'class-validator';
+import { IsDateString, IsString } from 'class-validator';
 import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Trip } from '../entities/trip.entity';
 
@@ -13,10 +13,13 @@ export class CreateTripInput extends PickType(Trip, [
   @IsString()
   summary?: string;
 
-  @Field(() => Date, { nullable: true })
-  @IsDate()
-  endDate?: Date;
+  @Field(() => String, { nullable: true })
+  @IsDateString()
+  endDate?: string;
 }
 
 @ObjectType()
-export class CreateTripOutput extends CoreOutput {}
+export class CreateTripOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  tripId?: number;
+}

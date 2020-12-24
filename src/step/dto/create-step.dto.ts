@@ -7,7 +7,8 @@ import { Step } from '../entities/step.entity';
 export class CreateStepInput extends PickType(Step, [
   'name',
   'country',
-  'coord',
+  'lat',
+  'lon',
   'arrivedAt',
   'timeZone',
 ]) {

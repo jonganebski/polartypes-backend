@@ -4,16 +4,22 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsDate, IsNumber, IsString, IsUrl } from 'class-validator';
+import {
+  IsDateString,
+  IsISO8601,
+  IsNumber,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 
 export enum Availability {
-  Private,
-  Followers,
-  Public,
+  Private = 'Private',
+  Followers = 'Followers',
+  Public = 'Public',
 }
 
 registerEnumType(Availability, { name: 'Availability' });
@@ -22,15 +28,15 @@ registerEnumType(Availability, { name: 'Availability' });
 @ObjectType() // 자동으로 스키마를 빌드하기 위한 GraphQL decorator
 @Entity() // TypeORM이 database에 저장할 수 있도록 하는 decorator
 export class Trip extends CoreEntity {
-  @Field(() => Date)
+  @Field(() => String)
   @Column()
-  @IsDate()
-  startDate: Date;
+  @IsISO8601({ strict: true })
+  startDate: string;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  @IsDate()
-  endDate?: Date;
+  @IsISO8601({ strict: true })
+  endDate?: string;
 
   @Field(() => String)
   @Column()

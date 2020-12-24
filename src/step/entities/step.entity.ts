@@ -1,5 +1,11 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsArray, IsDate, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDate,
+  IsISO8601,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
@@ -17,21 +23,25 @@ export class Step extends CoreEntity {
   @IsString()
   country: string;
 
-  // Coord field needs to be fixed later.
-  @Field(() => [Number])
-  @Column({ type: 'float', array: true })
-  @IsArray()
-  coord: number[];
+  @Field(() => Number)
+  @Column({ type: 'float' })
+  @IsNumber()
+  lat: number;
+
+  @Field(() => Number)
+  @Column({ type: 'float' })
+  @IsNumber()
+  lon: number;
 
   @Field(() => String)
   @Column()
   @IsString()
   name: string;
 
-  @Field(() => Date)
+  @Field(() => String)
   @Column()
-  @IsDate()
-  arrivedAt: Date;
+  @IsISO8601({ strict: true })
+  arrivedAt: string;
 
   @Field(() => String)
   @Column()
