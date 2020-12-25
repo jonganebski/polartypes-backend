@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Post,
   UploadedFile,
@@ -7,6 +8,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as aws from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import { DeleteFilesInput } from './dto/delete-images.dto';
 
 @Controller('aws-s3')
 export class AwsS3Controller {
@@ -48,6 +50,37 @@ export class AwsS3Controller {
       return { ok: true, url: result.Location };
     } catch {
       return { ok: false, error: 'Failed to upload image.' };
+    }
+  }
+
+  @Post('delete')
+  async deleteImage(
+    @Body() { urls }: DeleteFilesInput,
+  ): Promise<{ ok: boolean; error?: string }> {
+    aws.config.update({
+      credentials: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+      },
+    });
+    const objects = urls.map((url) => {
+      const key = url.split('amazonaws.com/')[1];
+      return { Key: key };
+    });
+    try {
+      const bucketName = process.env.AWS_S3_BUCKET_NAME;
+      const result = await new aws.S3()
+        .deleteObjects({
+          Bucket: bucketName,
+          Delete: { Objects: objects },
+        })
+        .promise();
+      if (result.Deleted.length !== urls.length) {
+        return { ok: false, error: 'Some images are not deleted.' };
+      }
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Failed to delete image.' };
     }
   }
 }
