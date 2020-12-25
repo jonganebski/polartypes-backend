@@ -23,6 +23,7 @@ import { TripsModule } from './trip/trip.module';
 import { Users } from './users/entities/user.entity';
 import { UsersModule } from './users/user.module';
 import { CommonModule } from './common/common.module';
+import { AwsS3Module } from './aws-s3/aws-s3.module';
 
 @Module({
   imports: [
@@ -38,6 +39,9 @@ import { CommonModule } from './common/common.module';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DATABASE: Joi.string().required(),
         JWT_PRIVATE_KEY: Joi.string().required(),
+        AWS_S3_ACCESS_KEY_ID: Joi.string().required(),
+        AWS_S3_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_S3_BUCKET_NAME: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({
@@ -62,6 +66,7 @@ import { CommonModule } from './common/common.module';
     JwtModule,
     StepModule,
     CommonModule,
+    AwsS3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
