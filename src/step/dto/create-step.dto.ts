@@ -6,11 +6,13 @@ import { Step } from '../entities/step.entity';
 @InputType()
 export class CreateStepInput extends PickType(Step, [
   'name',
+  'location',
   'country',
   'lat',
   'lon',
   'arrivedAt',
   'timeZone',
+  'imgUrls',
 ]) {
   @Field(() => Number)
   @IsNumber()
@@ -22,4 +24,7 @@ export class CreateStepInput extends PickType(Step, [
 }
 
 @ObjectType()
-export class CreateStepOutput extends CoreOutput {}
+export class CreateStepOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  createdStepId?: number;
+}

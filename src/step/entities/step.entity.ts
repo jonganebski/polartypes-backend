@@ -1,23 +1,20 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import {
-  IsArray,
-  IsDate,
-  IsISO8601,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsISO8601, IsNumber, IsString, IsUrl } from 'class-validator';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
-import { Image } from './image.entity';
 import { Like } from './like.entity';
 
 @InputType('StepInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class Step extends CoreEntity {
+  @Field(() => String)
+  @Column()
+  location: string;
+
   @Field(() => String)
   @Column()
   @IsString()
@@ -53,15 +50,16 @@ export class Step extends CoreEntity {
   @IsString()
   story?: string;
 
+  @Field(() => [String], { nullable: true })
+  @Column('text', { array: true, nullable: true })
+  @IsArray()
+  @IsUrl({}, { each: true })
+  imgUrls?: string[];
+
   // likes
   @Field(() => [Like])
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
-
-  // images
-  @Field(() => [Image])
-  @OneToMany(() => Image, (image) => image.step)
-  images: Image[];
 
   // comments
   @Field(() => [Comment])

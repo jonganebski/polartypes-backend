@@ -85,7 +85,6 @@ export class TripService {
             'steps',
             'steps.likes',
             'steps.likes.user',
-            'steps.images',
             'steps.comments',
             'traveler',
           ],

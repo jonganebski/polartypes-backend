@@ -10,4 +10,7 @@ export class DeleteStepInput {
 }
 
 @ObjectType()
-export class DeleteStepOutput extends CoreOutput {}
+export class DeleteStepOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  stepId?: number;
+}
