@@ -60,7 +60,7 @@ export class Trip extends CoreEntity {
   @Field(() => Number, { defaultValue: 0 })
   @Column({ default: 0 })
   @IsNumber()
-  views: number;
+  viewCount: number;
 
   // creator
   @Field(() => Users)

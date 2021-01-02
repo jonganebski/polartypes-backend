@@ -58,7 +58,7 @@ export class Step extends CoreEntity {
 
   // likes
   @Field(() => [Like])
-  @OneToMany(() => Like, (like) => like.user)
+  @OneToMany(() => Like, (like) => like.step)
   likes: Like[];
 
   // comments

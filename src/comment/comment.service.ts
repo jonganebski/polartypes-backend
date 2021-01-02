@@ -36,8 +36,8 @@ export class CommentService {
       const comment = await this.commentRepo.create(createCommentInput);
       comment.creator = user;
       comment.step = step;
-      await this.commentRepo.save(comment);
-      return { ok: true };
+      const savedComment = await this.commentRepo.save(comment);
+      return { ok: true, commentId: savedComment.id };
     } catch {
       return { ok: false, error: 'Failed to create comment.' };
     }
@@ -73,7 +73,11 @@ export class CommentService {
       if (comment.creatorId !== user.id) {
         return { ok: false, error: 'Not authorized.' };
       }
-      return { ok: true, error: "Not deleted. It's under development." };
+      const deleteResult = await this.commentRepo.delete({ id });
+      if (deleteResult.affected === 0) {
+        return { ok: false, error: 'Failed to delete comment.' };
+      }
+      return { ok: true };
     } catch {
       return { ok: false, error: 'Failed to delete comment.' };
     }

@@ -40,7 +40,7 @@ export class TripService {
         {
           slug: targetUsername.toLocaleLowerCase(),
         },
-        { relations: ['trips', 'followers', 'followings'] },
+        { relations: ['trips', 'trips.steps', 'followers', 'followings'] },
       );
       if (!targetUser) {
         return { ok: false, error: 'User not found.' };
@@ -83,10 +83,13 @@ export class TripService {
         {
           relations: [
             'steps',
+            'steps.traveler',
             'steps.likes',
             'steps.likes.user',
             'steps.comments',
+            'steps.comments.creator',
             'traveler',
+            'traveler.followers',
           ],
         },
       );
@@ -109,6 +112,7 @@ export class TripService {
           trip.availability !== Availability.Private,
       );
       if (isSelf || isPublicAllowed || isFollowersAllowedAndIsFollower) {
+        this.tripRepo.increment({ id: tripId }, 'viewCount', 1);
         return { ok: true, trip };
       } else {
         return { ok: false, error: 'You are not authorized.' };

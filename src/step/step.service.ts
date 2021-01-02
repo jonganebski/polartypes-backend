@@ -81,6 +81,7 @@ export class StepService {
 export class LikeService {
   constructor(
     @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
+    @InjectRepository(Step) private readonly stepRepo: Repository<Step>,
   ) {}
 
   async toggleLike(
@@ -94,11 +95,12 @@ export class LikeService {
           userId: user.id,
           stepId,
         });
-        return { ok: true };
+        return { ok: true, toggle: -999 };
       } else {
-        const like = this.likeRepo.create({ userId: user.id, stepId });
+        const step = await this.stepRepo.findOne({ id: stepId });
+        const like = this.likeRepo.create({ user, step });
         await this.likeRepo.save(like);
-        return { ok: true };
+        return { ok: true, toggle: 999 };
       }
     } catch {
       return { ok: false, error: 'Failed to toggle like.' };

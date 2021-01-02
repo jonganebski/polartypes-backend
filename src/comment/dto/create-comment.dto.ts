@@ -11,4 +11,7 @@ export class CreateCommentInput extends PickType(Comment, ['text']) {
 }
 
 @ObjectType()
-export class CreateCommentOutput extends CoreOutput {}
+export class CreateCommentOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  commentId?: number;
+}
