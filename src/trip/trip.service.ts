@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
 import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
@@ -14,6 +15,7 @@ export class TripService {
   constructor(
     @InjectRepository(Trip) private readonly tripRepo: Repository<Trip>,
     @InjectRepository(Users) private readonly userRepo: Repository<Users>,
+    private readonly awsS3Service: AwsS3Service,
   ) {}
 
   async createTrip(
@@ -112,7 +114,9 @@ export class TripService {
           trip.availability !== Availability.Private,
       );
       if (isSelf || isPublicAllowed || isFollowersAllowedAndIsFollower) {
-        this.tripRepo.increment({ id: tripId }, 'viewCount', 1);
+        if (!isSelf) {
+          this.tripRepo.increment({ id: tripId }, 'viewCount', 1);
+        }
         return { ok: true, trip };
       } else {
         return { ok: false, error: 'You are not authorized.' };
@@ -149,17 +153,29 @@ export class TripService {
     { tripId }: DeleteTripInput,
   ): Promise<DeleteTripOutput> {
     try {
-      const trip = await this.tripRepo.findOne({ id: tripId });
+      const trip = await this.tripRepo.findOne(
+        { id: tripId },
+        { relations: ['steps'] },
+      );
       if (!trip) {
         return { ok: false, error: 'Trip not found.' };
       }
       if (trip.travelerId !== user.id) {
         return { ok: false, error: 'Not authorized.' };
       }
-      // request delete images to aws s3.
-      console.log('Delete trip under development.');
-      return { ok: true, error: 'Not deleted. Delete trip under development.' };
-    } catch {
+      let imagesToDelete = [];
+      trip.steps.forEach((step) => {
+        imagesToDelete = imagesToDelete.concat(step.imgUrls);
+      });
+      await this.awsS3Service.deleteImage({
+        urls: imagesToDelete,
+      });
+      const { affected } = await this.tripRepo.delete({ id: tripId });
+      if (affected === 1) {
+        return { ok: true };
+      }
+    } catch (err) {
+      console.log(err);
       return { ok: false, error: 'Failed to delete trip.' };
     }
   }

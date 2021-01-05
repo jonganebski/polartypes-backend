@@ -6,6 +6,10 @@ import {
   CreateAccountInput,
   CreateAccountOutput,
 } from './dto/create-account.dto';
+import {
+  DeleteAccountInput,
+  DeleteAccountoutput,
+} from './dto/delete-account.dto';
 import { FollowInput, FollowOutput } from './dto/follow.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
 import {
@@ -71,6 +75,15 @@ export class UserResolver {
     @Args('input') unfollowInput: UnfollowInput,
   ): Promise<UnfollowOutput> {
     return this.userService.unfollow(user, unfollowInput);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => DeleteAccountoutput)
+  deleteAccount(
+    @AuthUser() user: Users,
+    @Args('input') deleteAccountInput: DeleteAccountInput,
+  ): Promise<DeleteAccountoutput> {
+    return this.userService.deleteAccount(user, deleteAccountInput);
   }
 
   @Query(() => ReadFollowersOutput)

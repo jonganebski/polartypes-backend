@@ -9,6 +9,7 @@ import { Step } from 'src/step/entities/step.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   JoinTable,
@@ -22,16 +23,21 @@ import {
 export class Users extends CoreEntity {
   // This table is named in plural because trying to avoid confusion with postgresql's default user table.
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    try {
-      this.password = await argon2.hash(this.password);
-    } catch (err) {
-      throw new InternalServerErrorException();
+    console.log('this.password: ', this.password);
+    if (this.password) {
+      try {
+        this.password = await argon2.hash(this.password);
+      } catch (err) {
+        throw new InternalServerErrorException();
+      }
     }
   }
 
   async verifyPassword(inputPassword: string): Promise<boolean> {
     try {
+      console.log(this.password, inputPassword);
       if (await argon2.verify(this.password, inputPassword)) {
         return true;
       } else {

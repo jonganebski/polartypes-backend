@@ -8,6 +8,7 @@ import {
   IsDateString,
   IsISO8601,
   IsNumber,
+  IsOptional,
   IsString,
   IsUrl,
 } from 'class-validator';
@@ -35,7 +36,8 @@ export class Trip extends CoreEntity {
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  @IsISO8601({ strict: true })
+  @IsOptional()
+  @IsISO8601()
   endDate?: string;
 
   @Field(() => String)

@@ -6,6 +6,10 @@ import {
   CreateAccountInput,
   CreateAccountOutput,
 } from './dto/create-account.dto';
+import {
+  DeleteAccountInput,
+  DeleteAccountoutput,
+} from './dto/delete-account.dto';
 import { FollowInput, FollowOutput } from './dto/follow.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
 import {
@@ -83,23 +87,44 @@ export class UserService {
 
   async updateAccount(
     user: Users,
-    updateAccountInput: UpdateAccountInput,
+    { password, newPassword, ...otherInputs }: UpdateAccountInput,
   ): Promise<UpdateAccountOutput> {
     try {
-      const isUpdatingUsername = Boolean(
-        user.username !== updateAccountInput.username,
+      const currentUser = await this.userRepo.findOne(
+        { id: user.id },
+        { select: ['password'] },
       );
+      const isUpdatingUsername = Boolean(
+        user.username !== otherInputs.username,
+      );
+      const isUpdatingPassword = Boolean(password && newPassword);
       if (isUpdatingUsername) {
-        const isUsernameExists = await this.userRepo.findOne({
-          username: updateAccountInput.username,
+        const user = await this.userRepo.findOne({
+          username: otherInputs.username,
         });
-        if (isUsernameExists) {
+        if (user) {
           return { ok: false, error: 'This username already exists.' };
         }
       }
-      await this.userRepo.save([{ id: user.id, ...updateAccountInput }]);
+      console.log(password, newPassword, otherInputs);
+      if (isUpdatingPassword) {
+        const isMatch = await currentUser.verifyPassword(password);
+        if (!isMatch) {
+          return { ok: false, error: 'Wrong password.' };
+        }
+        await this.userRepo.save(
+          this.userRepo.create({
+            id: user.id,
+            password: newPassword,
+            ...otherInputs,
+          }),
+        );
+      } else {
+        await this.userRepo.save({ id: user.id, ...otherInputs });
+      }
       return { ok: true };
-    } catch {
+    } catch (error) {
+      console.log(error);
       return { ok: false, error: 'Failed to update account.' };
     }
   }
@@ -188,6 +213,14 @@ export class UserService {
     }
   }
 
+  async deleteAccount(
+    user: Users,
+    deleteAccountInput: DeleteAccountInput,
+  ): Promise<DeleteAccountoutput> {
+    await this.userRepo.delete({ id: user.id });
+    return { ok: true };
+  }
+
   async readFollowers({
     targetUserId,
   }: ReadFollowersInput): Promise<ReadFollowersOutput> {
@@ -221,6 +254,4 @@ export class UserService {
       return { ok: false, error: 'Failed to load followings.' };
     }
   }
-
-  // request delete images to aws s3.
 }
