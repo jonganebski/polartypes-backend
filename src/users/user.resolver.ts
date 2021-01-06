@@ -1,5 +1,6 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import {
@@ -27,6 +28,8 @@ import {
 } from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
 import { UserService } from './user.service';
+
+const pubsub = new PubSub();
 
 @Resolver()
 export class UserResolver {
@@ -98,5 +101,18 @@ export class UserResolver {
     @Args('input') readFollowingsInput: ReadFollowingsInput,
   ): Promise<ReadFollowingsOutput> {
     return this.userService.readFollowings(readFollowingsInput);
+  }
+
+  @UseGuards(AuthGuard)
+  @Subscription(() => String)
+  searchUser() {
+    return pubsub.asyncIterator('allMight');
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => Boolean)
+  transferOneForAll() {
+    pubsub.publish('allMight', { searchUser: "next, it's your turn." });
+    return true;
   }
 }

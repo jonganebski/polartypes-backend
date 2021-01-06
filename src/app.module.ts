@@ -1,18 +1,14 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AwsS3Module } from './aws-s3/aws-s3.module';
 import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/entities/comment.entity';
-import { JwtMiddleware } from './jwt/jwt.middleware';
+import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
 import { Like } from './step/entities/like.entity';
 import { Step } from './step/entities/step.entity';
@@ -21,8 +17,6 @@ import { Trip } from './trip/entities/trip.entity';
 import { TripsModule } from './trip/trip.module';
 import { Users } from './users/entities/user.entity';
 import { UsersModule } from './users/user.module';
-import { CommonModule } from './common/common.module';
-import { AwsS3Module } from './aws-s3/aws-s3.module';
 
 @Module({
   imports: [
@@ -45,7 +39,16 @@ import { AwsS3Module } from './aws-s3/aws-s3.module';
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
-      context: ({ req }) => ({ user: req['user'] }),
+      installSubscriptionHandlers: true,
+      context: ({ req, connection }) => {
+        const TOKEN_KEY = 'x-jwt';
+        if (req) {
+          return { token: req.headers[TOKEN_KEY] };
+        }
+        if (connection) {
+          return { token: connection.context[TOKEN_KEY] };
+        }
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -59,10 +62,10 @@ import { AwsS3Module } from './aws-s3/aws-s3.module';
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
       entities: [Users, Trip, Step, Comment, Like], // typeORM will only take care of these entities.
     }),
+    JwtModule,
     UsersModule,
     TripsModule,
     CommentModule,
-    JwtModule,
     StepModule,
     CommonModule,
     AwsS3Module,
@@ -70,11 +73,12 @@ import { AwsS3Module } from './aws-s3/aws-s3.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.ALL,
-    });
-  }
-}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(JwtMiddleware).forRoutes({
+//       path: '*',
+//       method: RequestMethod.ALL,
+//     });
+//   }
+// }
+export class AppModule {}
