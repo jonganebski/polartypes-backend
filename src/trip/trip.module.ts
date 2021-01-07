@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AwsS3Module } from 'src/aws-s3/aws-s3.module';
+import { CommonModule } from 'src/common/common.module';
 import { Like } from 'src/step/entities/like.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { UsersModule } from 'src/users/user.module';

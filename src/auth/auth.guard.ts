@@ -1,16 +1,26 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from 'src/jwt/jwt.service';
 import { UserService } from 'src/users/user.service';
+import { TAccessable } from './access.decorator';
 
 // It will be used like `@UseGuards(AuthGuard)`.
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
+    private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
   ) {}
   async canActivate(context: ExecutionContext) {
+    const access = this.reflector.get<TAccessable>(
+      'access',
+      context.getHandler(),
+    );
+    if (!access) {
+      return true;
+    }
     const gqlContext = GqlExecutionContext.create(context).getContext();
     const token = gqlContext.token;
     if (token) {
@@ -30,6 +40,9 @@ export class AuthGuard implements CanActivate {
         console.log(err);
         return false;
       }
+    }
+    if (access === 'Any') {
+      return true;
     }
     return false;
   }

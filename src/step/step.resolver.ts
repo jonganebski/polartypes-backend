@@ -1,7 +1,6 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Access } from 'src/auth/access.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
@@ -13,7 +12,7 @@ import { LikeService, StepService } from './step.service';
 export class StepResolver {
   constructor(private readonly stepService: StepService) {}
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => CreateStepOutput)
   createStep(
     @AuthUser() user: Users,
@@ -22,7 +21,7 @@ export class StepResolver {
     return this.stepService.createStep(user, createStepInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => UpdateStepOutput)
   updateStep(
     @AuthUser() user: Users,
@@ -31,7 +30,7 @@ export class StepResolver {
     return this.stepService.updateStep(user, updateStepInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => DeleteStepOutput)
   deleteStep(
     @AuthUser() user: Users,
@@ -45,7 +44,7 @@ export class StepResolver {
 export class LikeResolver {
   constructor(private readonly likeService: LikeService) {}
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => ToggleLikeOutput)
   toggleLike(
     @AuthUser() user: Users,

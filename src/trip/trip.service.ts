@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
 import { Users } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
 import { DeleteTripInput, DeleteTripOutput } from './dto/delete-trip.dto';
 import { ReadTripInput, ReadTripOutput } from './dto/read-trip.dto';
 import { ReadTripsInput, ReadTripsOutput } from './dto/read-trips.dto';
+import { SearchInput, SearchOutput } from './dto/search.dto';
 import { UpdateTripInput, UpdateTripOutput } from './dto/update-trip.dto';
 import { Availability, Trip } from './entities/trip.entity';
 
@@ -42,7 +43,16 @@ export class TripService {
         {
           slug: targetUsername.toLocaleLowerCase(),
         },
-        { relations: ['trips', 'trips.steps', 'followers', 'followings'] },
+        {
+          relations: [
+            'trips',
+            'trips.steps',
+            'trips.steps.likes',
+            'trips.steps.likes.user',
+            'followers',
+            'followings',
+          ],
+        },
       );
       if (!targetUser) {
         return { ok: false, error: 'User not found.' };
@@ -51,6 +61,7 @@ export class TripService {
       const isFollower = Boolean(
         targetUser.followers?.some((follower) => follower.id === user?.id),
       );
+      console.log(user?.id, targetUser.id);
       if (isSelf) {
         // Reading user's own trips. (private)
         return { ok: true, targetUser };
@@ -177,6 +188,35 @@ export class TripService {
     } catch (err) {
       console.log(err);
       return { ok: false, error: 'Failed to delete trip.' };
+    }
+  }
+
+  async search({ searchTerm }: SearchInput): Promise<SearchOutput> {
+    try {
+      const [users, usersCount] = await this.userRepo.findAndCount({
+        where: [
+          {
+            firstName: Raw(
+              (firstName) => `${firstName} ILIKE '%${searchTerm}%'`,
+            ),
+          },
+          {
+            lastName: Raw((lastName) => `${lastName} ILIKE '%${searchTerm}%'`),
+          },
+        ],
+        take: 3,
+      });
+      const [trips, tripsCount] = await this.tripRepo.findAndCount({
+        where: {
+          name: Raw((name) => `${name} ILIKE '%${searchTerm}%'`),
+          availability: Availability.Public,
+        },
+        take: 3,
+        relations: ['traveler'],
+      });
+      return { ok: true, users, usersCount, trips, tripsCount };
+    } catch {
+      return { ok: false, error: 'Failed to search.' };
     }
   }
 }

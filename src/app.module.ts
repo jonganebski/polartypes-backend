@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
 import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/entities/comment.entity';
@@ -69,16 +70,9 @@ import { UsersModule } from './users/user.module';
     StepModule,
     CommonModule,
     AwsS3Module,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-// export class AppModule implements NestModule {
-//   configure(consumer: MiddlewareConsumer) {
-//     consumer.apply(JwtMiddleware).forRoutes({
-//       path: '*',
-//       method: RequestMethod.ALL,
-//     });
-//   }
-// }
 export class AppModule {}

@@ -1,7 +1,6 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Access } from 'src/auth/access.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
 import { CommentService } from './comment.service';
 import {
@@ -18,7 +17,7 @@ import { ReadCommentsInput, ReadCommentsOutput } from './dto/read-comments.dto';
 export class CommentResolver {
   constructor(private readonly commentService: CommentService) {}
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => CreateCommentOutput)
   createComment(
     @AuthUser() user: Users,
@@ -27,6 +26,7 @@ export class CommentResolver {
     return this.commentService.createComment(user, createCommentInput);
   }
 
+  @Access('Any')
   @Query(() => ReadCommentsOutput)
   readComments(
     @Args('input') readCommentsInput: ReadCommentsInput,
@@ -34,7 +34,7 @@ export class CommentResolver {
     return this.commentService.readComments(readCommentsInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => DeleteCommentOutput)
   deleteComment(
     @AuthUser() user: Users,

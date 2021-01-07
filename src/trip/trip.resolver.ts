@@ -1,12 +1,12 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Access } from 'src/auth/access.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { Users } from 'src/users/entities/user.entity';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
 import { DeleteTripInput, DeleteTripOutput } from './dto/delete-trip.dto';
 import { ReadTripInput, ReadTripOutput } from './dto/read-trip.dto';
 import { ReadTripsInput, ReadTripsOutput } from './dto/read-trips.dto';
+import { SearchInput, SearchOutput } from './dto/search.dto';
 import { UpdateTripInput, UpdateTripOutput } from './dto/update-trip.dto';
 import { TripService } from './trip.service';
 
@@ -14,7 +14,7 @@ import { TripService } from './trip.service';
 export class TripResolver {
   constructor(private readonly tripService: TripService) {}
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => CreateTripOutput)
   createTrip(
     @AuthUser() user: Users,
@@ -23,6 +23,7 @@ export class TripResolver {
     return this.tripService.createTrip(user, createTripInput);
   }
 
+  @Access('Any')
   @Query(() => ReadTripsOutput)
   readTrips(
     @AuthUser() user: Users,
@@ -31,6 +32,7 @@ export class TripResolver {
     return this.tripService.readTrips(user, readTripsInput);
   }
 
+  @Access('Any')
   @Query(() => ReadTripOutput)
   readTrip(
     @AuthUser() user: Users,
@@ -39,7 +41,7 @@ export class TripResolver {
     return this.tripService.readTrip(user, readTripInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => UpdateTripOutput)
   updateTrip(
     @AuthUser() user: Users,
@@ -48,12 +50,18 @@ export class TripResolver {
     return this.tripService.updateTrip(user, updateTripInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => DeleteTripOutput)
   deleteTrip(
     @AuthUser() user: Users,
     @Args('input') deleteTripInput: DeleteTripInput,
   ) {
     return this.tripService.deleteTrip(user, deleteTripInput);
+  }
+
+  @Access('Any')
+  @Query(() => SearchOutput)
+  search(@Args('input') searchInput: SearchInput): Promise<SearchOutput> {
+    return this.tripService.search(searchInput);
   }
 }

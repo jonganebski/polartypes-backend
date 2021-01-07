@@ -1,6 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
+import { Access } from 'src/auth/access.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import {
@@ -29,18 +30,17 @@ import {
 import { Users } from './entities/user.entity';
 import { UserService } from './user.service';
 
-const pubsub = new PubSub();
-
 @Resolver()
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Query(() => Users)
   whoAmI(@AuthUser() user: Users): Users {
     return user;
   }
 
+  @Access('Any')
   @Mutation(() => CreateAccountOutput)
   createAccount(
     @Args('input') createAccountInput: CreateAccountInput,
@@ -48,7 +48,7 @@ export class UserResolver {
     return this.userService.createAccount(createAccountInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => UpdateAccountOutput)
   updateAccount(
     @AuthUser() user: Users,
@@ -57,12 +57,13 @@ export class UserResolver {
     return this.userService.updateAccount(user, updateAccountInput);
   }
 
+  @Access('Any')
   @Mutation(() => LoginOutput)
   login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     return this.userService.login(loginInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => FollowOutput)
   follow(
     @AuthUser() user: Users,
@@ -71,7 +72,7 @@ export class UserResolver {
     return this.userService.follow(user, followInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => UnfollowOutput)
   unfollow(
     @AuthUser() user: Users,
@@ -80,7 +81,7 @@ export class UserResolver {
     return this.userService.unfollow(user, unfollowInput);
   }
 
-  @UseGuards(AuthGuard)
+  @Access('Signedin')
   @Mutation(() => DeleteAccountoutput)
   deleteAccount(
     @AuthUser() user: Users,
@@ -89,6 +90,7 @@ export class UserResolver {
     return this.userService.deleteAccount(user, deleteAccountInput);
   }
 
+  @Access('Signedin')
   @Query(() => ReadFollowersOutput)
   readFollowers(
     @Args('input') readFollowersInput: ReadFollowersInput,
@@ -96,6 +98,7 @@ export class UserResolver {
     return this.userService.readFollowers(readFollowersInput);
   }
 
+  @Access('Signedin')
   @Query(() => ReadFollowingsOutput)
   readFollowings(
     @Args('input') readFollowingsInput: ReadFollowingsInput,
@@ -103,16 +106,16 @@ export class UserResolver {
     return this.userService.readFollowings(readFollowingsInput);
   }
 
-  @UseGuards(AuthGuard)
-  @Subscription(() => String)
-  searchUser() {
-    return pubsub.asyncIterator('allMight');
-  }
+  // @Access('Signedin')
+  // @Subscription(() => String)
+  // searchUser() {
+  //   return pubsub.asyncIterator('allMight');
+  // }
 
-  @UseGuards(AuthGuard)
-  @Mutation(() => Boolean)
-  transferOneForAll() {
-    pubsub.publish('allMight', { searchUser: "next, it's your turn." });
-    return true;
-  }
+  // @Access('Signedin')
+  // @Mutation(() => Boolean)
+  // transferOneForAll() {
+  //   pubsub.publish('allMight', { searchUser: "next, it's your turn." });
+  //   return true;
+  // }
 }
