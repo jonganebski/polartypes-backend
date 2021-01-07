@@ -185,7 +185,7 @@ export class UserService {
       await this.userRepo.save([
         { id, ...targetUser, followers: targetUser.followers },
       ]);
-      return { ok: true };
+      return { ok: true, targetUserId: targetUser.id };
     } catch (err) {
       console.log(err);
       return { ok: false, error: 'Failed to follow.' };
@@ -207,7 +207,7 @@ export class UserService {
       await this.userRepo.save([
         { id, ...targetUser, followers: targetUser.followers },
       ]);
-      return { ok: true };
+      return { ok: true, targetUserId: targetUser.id };
     } catch {
       return { ok: false, error: 'Failed to unfollow.' };
     }

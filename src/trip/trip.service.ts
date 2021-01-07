@@ -61,7 +61,6 @@ export class TripService {
       const isFollower = Boolean(
         targetUser.followers?.some((follower) => follower.id === user?.id),
       );
-      console.log(user?.id, targetUser.id);
       if (isSelf) {
         // Reading user's own trips. (private)
         return { ok: true, targetUser };
@@ -103,6 +102,7 @@ export class TripService {
             'steps.comments.creator',
             'traveler',
             'traveler.followers',
+            'traveler.followings',
           ],
         },
       );
