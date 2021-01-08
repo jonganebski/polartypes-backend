@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { USER_ERR } from 'src/common/error.constants';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import {
@@ -12,10 +13,6 @@ import {
 } from './dto/delete-account.dto';
 import { FollowInput, FollowOutput } from './dto/follow.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
-import {
-  ReadFollowersInput,
-  ReadFollowersOutput,
-} from './dto/read-followers.dto';
 import {
   ReadFollowingsInput,
   ReadFollowingsOutput,
@@ -43,17 +40,9 @@ export class UserService {
     try {
       const existUser = await this.userRepo.findOne({ email });
       if (existUser) {
-        return { ok: false, error: 'Email already exists.' };
+        return { ok: false, error: USER_ERR.emailExists };
       }
-      const sanitizedFirstName = firstName.replace(/[^a-zA-Z0-9]+/g, '');
-      const sanitizedLastName = lastName.replace(/[^a-zA-Z0-9]+/g, '');
-      if (!sanitizedFirstName || !sanitizedLastName) {
-        return {
-          ok: false,
-          error: 'First and last name only accetps english and number.',
-        };
-      }
-      let username = sanitizedFirstName + sanitizedLastName;
+      let username = firstName + lastName;
       let slug = username.toLowerCase();
       let count = 0;
       while (true) {
@@ -72,8 +61,8 @@ export class UserService {
         this.userRepo.create({
           email,
           password,
-          firstName: sanitizedFirstName,
-          lastName: sanitizedLastName,
+          firstName,
+          lastName,
           username,
           slug,
         }),
@@ -81,7 +70,7 @@ export class UserService {
       const token = this.jwtService.sign(savedUser.id, false);
       return { ok: true, token, username };
     } catch {
-      return { ok: false, error: 'Failed to create account.' };
+      return { ok: false, error: USER_ERR.failed };
     }
   }
 
@@ -103,14 +92,14 @@ export class UserService {
           username: otherInputs.username,
         });
         if (user) {
-          return { ok: false, error: 'This username already exists.' };
+          return { ok: false, error: USER_ERR.usernameExists };
         }
       }
       console.log(password, newPassword, otherInputs);
       if (isUpdatingPassword) {
         const isMatch = await currentUser.verifyPassword(password);
         if (!isMatch) {
-          return { ok: false, error: 'Wrong password.' };
+          return { ok: false, error: USER_ERR.wrongPassword };
         }
         await this.userRepo.save(
           this.userRepo.create({
@@ -125,7 +114,7 @@ export class UserService {
       return { ok: true };
     } catch (error) {
       console.log(error);
-      return { ok: false, error: 'Failed to update account.' };
+      return { ok: false, error: USER_ERR.failed };
     }
   }
 
@@ -145,37 +134,37 @@ export class UserService {
           { select: ['id', 'password', 'username'] },
         );
         if (!user) {
-          return { ok: false, error: 'User does not exist.' };
+          return { ok: false, error: USER_ERR.userNotFound };
         }
       }
       const isMatch = await user.verifyPassword(password);
       if (!isMatch) {
-        return { ok: false, error: 'Wrong password.' };
+        return { ok: false, error: USER_ERR.wrongPassword };
       }
       const token = this.jwtService.sign(user.id, rememberMe);
-      console.log(user);
       return { ok: true, token, username: user.username };
     } catch {
-      return { ok: false, error: 'Failed to login.' };
+      return { ok: false, error: USER_ERR.failed };
     }
   }
 
-  async findById(id: number) {
+  async findById(id: number): Promise<{ user?: Users; error?: string }> {
     try {
       const user = await this.userRepo.findOneOrFail({ id });
-      return { user, error: null };
+      return { user };
     } catch {
-      return { user: null, error: 'Failed to find a user.' };
+      return { error: USER_ERR.failed };
     }
   }
 
   async follow(user: Users, { id }: FollowInput): Promise<FollowOutput> {
     try {
-      const targetUser = await this.userRepo.findOne(id, {
-        relations: ['followers'],
-      });
+      const targetUser = await this.userRepo.findOne(
+        { id },
+        { relations: ['followers'] },
+      );
       if (!targetUser) {
-        return { ok: false, error: 'User not found.' };
+        return { ok: false, error: USER_ERR.userNotFound };
       }
       if (!targetUser.followers) {
         targetUser.followers = [user];
@@ -187,8 +176,7 @@ export class UserService {
       ]);
       return { ok: true, targetUserId: targetUser.id };
     } catch (err) {
-      console.log(err);
-      return { ok: false, error: 'Failed to follow.' };
+      return { ok: false, error: USER_ERR.failed };
     }
   }
 
@@ -199,7 +187,7 @@ export class UserService {
         { relations: ['followers'] },
       );
       if (!targetUser) {
-        return { ok: false, error: 'User not found.' };
+        return { ok: false, error: USER_ERR.userNotFound };
       }
       targetUser.followers = targetUser.followers.filter(
         (follower) => follower.id !== user.id,
@@ -209,7 +197,7 @@ export class UserService {
       ]);
       return { ok: true, targetUserId: targetUser.id };
     } catch {
-      return { ok: false, error: 'Failed to unfollow.' };
+      return { ok: false, error: USER_ERR.failed };
     }
   }
 
@@ -221,23 +209,6 @@ export class UserService {
     return { ok: true };
   }
 
-  async readFollowers({
-    targetUserId,
-  }: ReadFollowersInput): Promise<ReadFollowersOutput> {
-    try {
-      const targetUser = await this.userRepo.findOne({
-        where: { id: targetUserId },
-        relations: ['followers'],
-      });
-      if (!targetUser) {
-        return { ok: false, error: 'User not found.' };
-      }
-      return { ok: true, followers: targetUser.followers };
-    } catch {
-      return { ok: false, error: 'Failed to load followers.' };
-    }
-  }
-
   async readFollowings({
     targetUserId,
   }: ReadFollowingsInput): Promise<ReadFollowingsOutput> {
@@ -247,11 +218,11 @@ export class UserService {
         relations: ['followings'],
       });
       if (!targetUser) {
-        return { ok: false, error: 'User not found.' };
+        return { ok: false, error: USER_ERR.userNotFound };
       }
       return { ok: true, followings: targetUser.followings };
     } catch {
-      return { ok: false, error: 'Failed to load followings.' };
+      return { ok: false, error: USER_ERR.failed };
     }
   }
 }

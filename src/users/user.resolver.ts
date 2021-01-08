@@ -1,9 +1,6 @@
-import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
-import { PubSub } from 'graphql-subscriptions';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Access } from 'src/auth/access.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
-import { AuthGuard } from 'src/auth/auth.guard';
 import {
   CreateAccountInput,
   CreateAccountOutput,
@@ -14,10 +11,6 @@ import {
 } from './dto/delete-account.dto';
 import { FollowInput, FollowOutput } from './dto/follow.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
-import {
-  ReadFollowersInput,
-  ReadFollowersOutput,
-} from './dto/read-followers.dto';
 import {
   ReadFollowingsInput,
   ReadFollowingsOutput,
@@ -88,14 +81,6 @@ export class UserResolver {
     @Args('input') deleteAccountInput: DeleteAccountInput,
   ): Promise<DeleteAccountoutput> {
     return this.userService.deleteAccount(user, deleteAccountInput);
-  }
-
-  @Access('Signedin')
-  @Query(() => ReadFollowersOutput)
-  readFollowers(
-    @Args('input') readFollowersInput: ReadFollowersInput,
-  ): Promise<ReadFollowersOutput> {
-    return this.userService.readFollowers(readFollowersInput);
   }
 
   @Access('Signedin')

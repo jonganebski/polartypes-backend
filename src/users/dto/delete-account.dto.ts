@@ -4,7 +4,7 @@ import { CoreOutput } from 'src/common/dto/common-output.dto';
 @InputType()
 export class DeleteAccountInput {
   @Field(() => String, { nullable: true })
-  password?: string; // this shoul be required field later
+  password?: string; // this should be required field later
 }
 
 @ObjectType()
