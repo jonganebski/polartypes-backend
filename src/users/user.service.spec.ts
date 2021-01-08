@@ -1,8 +1,7 @@
-import { PartialType } from '@nestjs/graphql';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'aws-sdk/clients/appstream';
-import { USER_ERR } from 'src/common/error.constants';
+import { USER_ERR } from 'src/common/common.constants';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import { Users } from './entities/user.entity';

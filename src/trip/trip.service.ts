@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
+import { TRIP_ERR, USER_ERR } from 'src/common/common.constants';
 import { Users } from 'src/users/entities/user.entity';
 import { Raw, Repository } from 'typeorm';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
@@ -29,8 +30,7 @@ export class TripService {
       const savedTrip = await this.tripRepo.save(newTrip);
       return { ok: true, tripId: savedTrip.id };
     } catch (err) {
-      console.log(err);
-      return { ok: false, error: 'Failed to create trip.' };
+      return { ok: false, error: TRIP_ERR.failed };
     }
   }
 
@@ -55,7 +55,7 @@ export class TripService {
         },
       );
       if (!targetUser) {
-        return { ok: false, error: 'User not found.' };
+        return { ok: false, error: USER_ERR.userNotFound };
       }
       const isSelf = Boolean(user?.id === targetUser.id);
       const isFollower = Boolean(
@@ -79,7 +79,7 @@ export class TripService {
       return { ok: true, targetUser };
     } catch (err) {
       console.log(err);
-      return { ok: false, error: 'Failed to load trips.' };
+      return { ok: false, error: TRIP_ERR.failed };
     }
   }
 
@@ -107,14 +107,14 @@ export class TripService {
         },
       );
       if (!trip) {
-        return { ok: false, error: 'Trip not found.' };
+        return { ok: false, error: TRIP_ERR.tripNotFound };
       }
       const targetUser = await this.userRepo.findOne(
         { id: trip.travelerId },
         { relations: ['followers'] },
       );
       if (!targetUser) {
-        return { ok: false, error: 'User not found.' };
+        return { ok: false, error: USER_ERR.userNotFound };
       }
       const isSelf = Boolean(user?.id === trip.travelerId);
       const isPublicAllowed = Boolean(
@@ -130,32 +130,30 @@ export class TripService {
         }
         return { ok: true, trip };
       } else {
-        return { ok: false, error: 'You are not authorized.' };
+        return { ok: false, error: TRIP_ERR.notAuthorized };
       }
     } catch (err) {
       console.log(err);
-      return { ok: false, error: 'Failed to load steps.' };
+      return { ok: false, error: TRIP_ERR.failed };
     }
   }
 
   async updateTrip(
     user: Users,
-    updateTripInput: UpdateTripInput,
+    { tripId, ...values }: UpdateTripInput,
   ): Promise<UpdateTripOutput> {
     try {
-      const trip = await this.tripRepo.findOne({ id: updateTripInput.tripId });
+      const trip = await this.tripRepo.findOne({ id: tripId });
       if (!trip) {
-        return { ok: false, error: 'Trip not found.' };
+        return { ok: false, error: TRIP_ERR.tripNotFound };
       }
       if (trip.travelerId !== user.id) {
-        return { ok: false, error: 'Not authorized.' };
+        return { ok: false, error: TRIP_ERR.notAuthorized };
       }
-      await this.tripRepo.save([
-        { id: updateTripInput.tripId, ...updateTripInput },
-      ]);
+      await this.tripRepo.save([{ id: tripId, ...values }]);
       return { ok: true };
-    } catch (error) {
-      return { ok: false, error };
+    } catch {
+      return { ok: false, error: TRIP_ERR.failed };
     }
   }
 
@@ -169,10 +167,10 @@ export class TripService {
         { relations: ['steps'] },
       );
       if (!trip) {
-        return { ok: false, error: 'Trip not found.' };
+        return { ok: false, error: TRIP_ERR.tripNotFound };
       }
       if (trip.travelerId !== user.id) {
-        return { ok: false, error: 'Not authorized.' };
+        return { ok: false, error: TRIP_ERR.notAuthorized };
       }
       let imagesToDelete = [];
       trip.steps.forEach((step) => {
@@ -187,7 +185,7 @@ export class TripService {
       }
     } catch (err) {
       console.log(err);
-      return { ok: false, error: 'Failed to delete trip.' };
+      return { ok: false, error: TRIP_ERR.failed };
     }
   }
 
@@ -216,7 +214,7 @@ export class TripService {
       });
       return { ok: true, users, usersCount, trips, tripsCount };
     } catch {
-      return { ok: false, error: 'Failed to search.' };
+      return { ok: false, error: TRIP_ERR.failed };
     }
   }
 }

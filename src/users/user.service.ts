@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { USER_ERR } from 'src/common/error.constants';
+import { USER_ERR } from 'src/common/common.constants';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import {
