@@ -69,7 +69,8 @@ export class UserService {
       );
       const token = this.jwtService.sign(savedUser.id, false);
       return { ok: true, token, username };
-    } catch {
+    } catch (err) {
+      console.log(err);
       return { ok: false, error: USER_ERR.failed };
     }
   }
