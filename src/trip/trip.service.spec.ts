@@ -4,7 +4,7 @@ import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
 import { TRIP_ERR, USER_ERR } from 'src/common/common.constants';
 import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import * as typeorm from 'typeorm';
 import { Availability, Trip } from './entities/trip.entity';
 import { TripService } from './trip.service';
 
@@ -31,8 +31,8 @@ const mockAwsS3Service = () => {
 
 describe('tripService', () => {
   let service: TripService;
-  let tripRepo: Partial<Record<keyof Repository<Trip>, jest.Mock>>;
-  let userRepo: Partial<Record<keyof Repository<Users>, jest.Mock>>;
+  let tripRepo: Partial<Record<keyof typeorm.Repository<Trip>, jest.Mock>>;
+  let userRepo: Partial<Record<keyof typeorm.Repository<Users>, jest.Mock>>;
   let awsS3Service: AwsS3Service;
 
   beforeEach(async () => {
@@ -339,6 +339,7 @@ describe('tripService', () => {
     const mockTrips = [{ id: 1 }];
     const mockTripsCount = 1;
     it('should return search result', async () => {
+      const rawSpy = jest.spyOn(typeorm, 'Raw');
       userRepo.findAndCount.mockResolvedValue([mockUsers, mockUsersCount]);
       tripRepo.findAndCount.mockResolvedValue([mockTrips, mockTripsCount]);
       const result = await service.search({ searchTerm: mockSearchTerm });
@@ -346,6 +347,7 @@ describe('tripService', () => {
       expect(userRepo.findAndCount).toHaveBeenCalledWith(expect.any(Object));
       expect(tripRepo.findAndCount).toHaveBeenCalledTimes(1);
       expect(tripRepo.findAndCount).toHaveBeenCalledWith(expect.any(Object));
+      expect(rawSpy).toHaveBeenCalledTimes(3);
       expect(result).toEqual({
         ok: true,
         users: mockUsers,
