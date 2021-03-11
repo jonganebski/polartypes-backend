@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
-import { TRIP_ERR, USER_ERR } from 'src/common/common.constants';
+import { COMMON_ERR, TRIP_ERR, USER_ERR } from 'src/common/common.constants';
 import { Users } from 'src/users/entities/user.entity';
 import { Raw, Repository } from 'typeorm';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
@@ -130,7 +130,7 @@ export class TripService {
         }
         return { ok: true, trip };
       } else {
-        return { ok: false, error: TRIP_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.notAuthorized };
       }
     } catch (err) {
       console.log(err);
@@ -148,7 +148,7 @@ export class TripService {
         return { ok: false, error: TRIP_ERR.tripNotFound };
       }
       if (trip.travelerId !== user.id) {
-        return { ok: false, error: TRIP_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.notAuthorized };
       }
       await this.tripRepo.save([{ id: tripId, ...values }]);
       return { ok: true };
@@ -170,7 +170,7 @@ export class TripService {
         return { ok: false, error: TRIP_ERR.tripNotFound };
       }
       if (trip.travelerId !== user.id) {
-        return { ok: false, error: TRIP_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.notAuthorized };
       }
       let imagesToDelete = [];
       trip.steps.forEach((step) => {

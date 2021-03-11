@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { COMMON_ERR, STEP_ERR } from 'src/common/common.constants';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -29,7 +30,7 @@ export class StepService {
       const { id: createdStepId } = await this.stepRepo.save(step);
       return { ok: true, createdStepId };
     } catch {
-      return { ok: false, error: 'Failed to create step.' };
+      return { ok: false, error: STEP_ERR.createStepfailed };
     }
   }
 
@@ -40,17 +41,17 @@ export class StepService {
     try {
       const step = await this.stepRepo.findOne({ id: updateStepInput.stepId });
       if (!step) {
-        return { ok: false, error: 'Step not found.' };
+        return { ok: false, error: STEP_ERR.stepNotFound };
       }
       if (step.travelerId !== user.id) {
-        return { ok: false, error: 'You are not authorized.' };
+        return { ok: false, error: COMMON_ERR.notAuthorized };
       }
       await this.stepRepo.save([
         { id: updateStepInput.stepId, ...updateStepInput },
       ]);
       return { ok: true };
     } catch {
-      return { ok: false, error: 'Failed to update step.' };
+      return { ok: false, error: STEP_ERR.updateStepFailed };
     }
   }
 
@@ -61,18 +62,15 @@ export class StepService {
     try {
       const step = await this.stepRepo.findOne({ id: stepId });
       if (!step) {
-        return { ok: false, error: 'Step not found.' };
+        return { ok: false, error: STEP_ERR.stepNotFound };
       }
       if (step.travelerId !== user.id) {
-        return { ok: false, error: 'You are not authorized.' };
+        return { ok: false, error: COMMON_ERR.notAuthorized };
       }
-      const deleteResult = await this.stepRepo.delete({ id: stepId });
-      if (deleteResult.affected === 0) {
-        return { ok: false, error: 'Failed to delete step.' };
-      }
+      await this.stepRepo.delete({ id: stepId });
       return { ok: true, stepId };
     } catch {
-      return { ok: false, error: 'Failed to delete step.' };
+      return { ok: false, error: STEP_ERR.deleteStepFailed };
     }
   }
 }

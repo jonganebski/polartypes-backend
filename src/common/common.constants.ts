@@ -2,6 +2,10 @@ export const PUB_SUB = 'pubsub';
 
 export const SEARCH = 'search';
 
+export const COMMON_ERR = {
+  notAuthorized: 'You are not authorized.',
+};
+
 export const USER_ERR = {
   emailExists: 'Email already exists.',
   usernameExists: 'This username already exists.',
@@ -14,6 +18,12 @@ export const USER_ERR = {
 
 export const TRIP_ERR = {
   tripNotFound: 'Trip not found.',
-  notAuthorized: 'You are not authorized.',
   failed: 'Function failed.',
+};
+
+export const STEP_ERR = {
+  stepNotFound: 'Step not found',
+  createStepfailed: 'Failed to create step.',
+  updateStepFailed: 'Failed to update step.',
+  deleteStepFailed: 'Failed to delete step.',
 };
