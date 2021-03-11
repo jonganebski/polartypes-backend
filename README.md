@@ -36,5 +36,5 @@ $ npm run start:dev
 ---
 
 <p align="center">
-<a href="https://github.com/jonganebski/polartypes-backend" target="_blank">Go to NestJS backend repository</a>
+<a href="https://github.com/jonganebski/polartypes-frontend" target="_blank">Go to React frontend repository</a>
 </p>
