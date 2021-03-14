@@ -224,4 +224,20 @@ export class UserService {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
+
+  async countFollowings(user: Users): Promise<number> {
+    return this.userRepo
+      .createQueryBuilder('user')
+      .leftJoin('user.followers', 'follower')
+      .where('follower.id = :id', { id: user.id })
+      .getCount();
+  }
+
+  async countFollwers(user: Users): Promise<number> {
+    return this.userRepo
+      .createQueryBuilder('user')
+      .leftJoin('user.followings', 'following')
+      .where('following.id = :id', { id: user.id })
+      .getCount();
+  }
 }

@@ -1,4 +1,12 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Query,
+  ResolveField,
+  Resolver,
+  Root,
+} from '@nestjs/graphql';
 import { Access } from 'src/auth/access.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import {
@@ -23,7 +31,7 @@ import {
 import { Users } from './entities/user.entity';
 import { UserService } from './user.service';
 
-@Resolver()
+@Resolver(Users)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
@@ -89,6 +97,18 @@ export class UserResolver {
     @Args('input') readFollowingsInput: ReadFollowingsInput,
   ): Promise<ReadFollowingsOutput> {
     return this.userService.readFollowings(readFollowingsInput);
+  }
+
+  @Access('Signedin')
+  @ResolveField(() => Int)
+  async countFollowings(@Root() user: Users): Promise<number> {
+    return this.userService.countFollowings(user);
+  }
+
+  @Access('Signedin')
+  @ResolveField(() => Int)
+  async countFollowers(@Root() user: Users): Promise<number> {
+    return this.userService.countFollwers(user);
   }
 
   // @Access('Signedin')
