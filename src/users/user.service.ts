@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { USER_ERR } from 'src/errors/user.errors';
 import { JwtService } from 'src/jwt/jwt.service';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import {
   CreateAccountInput,
   CreateAccountOutput,
@@ -45,16 +45,14 @@ export class UserService {
       }
       let username = firstName + lastName;
       let slug = username.toLowerCase();
-      let count = 0;
+      let number = 1;
       while (true) {
-        const existUser = await this.userRepo.findOne({ slug });
+        const existUser = await this.userRepo.count({ slug });
         if (existUser) {
-          ++count;
-          slug = slug + count + '';
+          username = `${username}${number}`;
+          slug = `${slug}${number}`;
+          number++;
         } else {
-          if (count !== 0) {
-            username = username + count + '';
-          }
           break;
         }
       }

@@ -20,12 +20,11 @@ import {
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
+// This table is named in plural because trying to avoid confusion with postgresql's default user table.
 export class Users extends CoreEntity {
-  // This table is named in plural because trying to avoid confusion with postgresql's default user table.
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    console.log('this.password: ', this.password);
     if (this.password) {
       try {
         this.password = await argon2.hash(this.password);
@@ -73,10 +72,10 @@ export class Users extends CoreEntity {
   @IsString()
   firstName: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column()
   @IsString()
-  lastName: string;
+  lastName?: string;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
