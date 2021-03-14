@@ -125,7 +125,7 @@ export class UserService {
     try {
       const user = await this.userRepo.findOne({
         where: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
-        select: ['id', 'username'],
+        select: ['id', 'username', 'password'],
       });
       if (!user) return { ok: false, error: USER_ERR.WrongCredentials };
 
@@ -150,18 +150,15 @@ export class UserService {
 
   async follow(user: Users, { id }: FollowInput): Promise<FollowOutput> {
     try {
-      const targetUser = await this.userRepo.findOne(
-        { id },
-        { relations: ['followers'] },
-      );
-      if (!targetUser) {
-        return { ok: false, error: USER_ERR.UserNotFound };
-      }
-      if (!targetUser.followers) {
-        targetUser.followers = [user];
-      } else {
-        targetUser.followers = [...targetUser.followers, user];
-      }
+      const targetUser = await this.userRepo.findOne({
+        where: { id },
+        select: ['id'],
+        relations: ['followers'],
+      });
+      if (!targetUser) return { ok: false, error: USER_ERR.UserNotFound };
+
+      targetUser.followers = [...targetUser.followers, user];
+
       await this.userRepo.save([
         { id, ...targetUser, followers: targetUser.followers },
       ]);
@@ -173,16 +170,17 @@ export class UserService {
 
   async unfollow(user: Users, { id }: UnfollowInput): Promise<UnfollowOutput> {
     try {
-      const targetUser = await this.userRepo.findOne(
-        { id },
-        { relations: ['followers'] },
-      );
-      if (!targetUser) {
-        return { ok: false, error: USER_ERR.UserNotFound };
-      }
+      const targetUser = await this.userRepo.findOne({
+        where: { id },
+        select: ['id'],
+        relations: ['followers'],
+      });
+      if (!targetUser) return { ok: false, error: USER_ERR.UserNotFound };
+
       targetUser.followers = targetUser.followers.filter(
         (follower) => follower.id !== user.id,
       );
+
       await this.userRepo.save([
         { id, ...targetUser, followers: targetUser.followers },
       ]);
@@ -194,12 +192,21 @@ export class UserService {
 
   async deleteAccount(
     user: Users,
-    deleteAccountInput: DeleteAccountInput,
+    { password }: DeleteAccountInput,
   ): Promise<DeleteAccountoutput> {
-    await this.userRepo.delete({ id: user.id });
-    return { ok: true };
+    const isMatch = user.verifyPassword(password);
+    try {
+      if (!isMatch) return { ok: false, error: COMMON_ERR.NotAuthorized };
+
+      const { affected } = await this.userRepo.delete({ id: user.id });
+      if (!affected) throw Error();
+      return { ok: true };
+    } catch {
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
+    }
   }
 
+  // Need refactoring to all followers/following logic
   async readFollowings({
     targetUserId,
   }: ReadFollowingsInput): Promise<ReadFollowingsOutput> {
@@ -212,7 +219,8 @@ export class UserService {
         return { ok: false, error: USER_ERR.UserNotFound };
       }
       return { ok: true, followings: targetUser.followings };
-    } catch {
+    } catch (err) {
+      console.log(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
