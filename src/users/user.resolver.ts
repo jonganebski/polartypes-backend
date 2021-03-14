@@ -99,16 +99,34 @@ export class UserResolver {
     return this.userService.readFollowings(readFollowingsInput);
   }
 
-  @Access('Signedin')
+  // ====== Resolved Fields =======
+
   @ResolveField(() => Int)
   async countFollowings(@Root() user: Users): Promise<number> {
     return this.userService.countFollowings(user);
   }
 
-  @Access('Signedin')
   @ResolveField(() => Int)
   async countFollowers(@Root() user: Users): Promise<number> {
     return this.userService.countFollwers(user);
+  }
+
+  @Access('Signedin')
+  @ResolveField(() => Boolean)
+  async isFollowing(
+    @Root() rootUser: Users,
+    @AuthUser() authUser: Users,
+  ): Promise<boolean> {
+    return this.userService.isFollowing(rootUser, authUser);
+  }
+
+  @Access('Signedin')
+  @ResolveField(() => Boolean)
+  async isFollower(
+    @Root() rootUser: Users,
+    @AuthUser() authUser: Users,
+  ): Promise<boolean> {
+    return this.userService.isFollower(rootUser, authUser);
   }
 
   // @Access('Signedin')

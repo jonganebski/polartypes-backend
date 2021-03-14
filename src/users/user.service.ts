@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommentResolver } from 'src/comment/comment.resolver';
 import { COMMON_ERR } from 'src/errors/common.errors';
 import { USER_ERR } from 'src/errors/user.errors';
 import { JwtService } from 'src/jwt/jwt.service';
@@ -239,5 +240,30 @@ export class UserService {
       .leftJoin('user.followings', 'following')
       .where('following.id = :id', { id: user.id })
       .getCount();
+  }
+
+  async isFollowing(rootUser: Users, authUser: Users): Promise<boolean> {
+    if (authUser) {
+      const count = await this.userRepo
+        .createQueryBuilder('rootUser')
+        .innerJoin('rootUser.followers', 'follower')
+        .where('rootUser.id = :id', { id: rootUser.id })
+        .andWhere('follower.id = :authUserId', { authUserId: authUser.id })
+        .getCount();
+      return Boolean(count);
+    }
+    return false;
+  }
+  async isFollower(rootUser: Users, authUser: Users): Promise<boolean> {
+    if (authUser) {
+      const count = await this.userRepo
+        .createQueryBuilder('rootUser')
+        .innerJoin('rootUser.followings', 'following')
+        .where('rootUser.id = :id', { id: rootUser.id })
+        .andWhere('following.id = :authUserId', { authUserId: authUser.id })
+        .getCount();
+      return Boolean(count);
+    }
+    return false;
   }
 }
