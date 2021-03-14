@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { COMMON_ERR, STEP_ERR } from 'src/common/common.constants';
+import { COMMON_ERR } from 'src/errors/common.errors';
+import { STEP_ERR } from 'src/errors/step.errors';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -30,7 +31,7 @@ export class StepService {
       const { id: createdStepId } = await this.stepRepo.save(step);
       return { ok: true, createdStepId };
     } catch {
-      return { ok: false, error: STEP_ERR.createStepfailed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -41,17 +42,17 @@ export class StepService {
     try {
       const step = await this.stepRepo.findOne({ id: updateStepInput.stepId });
       if (!step) {
-        return { ok: false, error: STEP_ERR.stepNotFound };
+        return { ok: false, error: STEP_ERR.StepNotFound };
       }
       if (step.travelerId !== user.id) {
-        return { ok: false, error: COMMON_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
       await this.stepRepo.save([
         { id: updateStepInput.stepId, ...updateStepInput },
       ]);
       return { ok: true };
     } catch {
-      return { ok: false, error: STEP_ERR.updateStepFailed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -62,15 +63,15 @@ export class StepService {
     try {
       const step = await this.stepRepo.findOne({ id: stepId });
       if (!step) {
-        return { ok: false, error: STEP_ERR.stepNotFound };
+        return { ok: false, error: STEP_ERR.StepNotFound };
       }
       if (step.travelerId !== user.id) {
-        return { ok: false, error: COMMON_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
       await this.stepRepo.delete({ id: stepId });
       return { ok: true, stepId };
     } catch {
-      return { ok: false, error: STEP_ERR.deleteStepFailed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 }
@@ -101,7 +102,7 @@ export class LikeService {
         return { ok: true, toggle: 999 };
       }
     } catch {
-      return { ok: false, error: 'Failed to toggle like.' };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 }

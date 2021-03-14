@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { USER_ERR } from 'src/common/common.constants';
+import { USER_ERR } from 'src/errors/user.errors';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import {
@@ -23,6 +23,7 @@ import {
   UpdateAccountOutput,
 } from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
+import { COMMON_ERR } from 'src/errors/common.errors';
 
 @Injectable()
 export class UserService {
@@ -40,7 +41,7 @@ export class UserService {
     try {
       const existUser = await this.userRepo.findOne({ email });
       if (existUser) {
-        return { ok: false, error: USER_ERR.emailExists };
+        return { ok: false, error: USER_ERR.EmailExists };
       }
       let username = firstName + lastName;
       let slug = username.toLowerCase();
@@ -71,7 +72,7 @@ export class UserService {
       return { ok: true, token, username };
     } catch (err) {
       console.log(err);
-      return { ok: false, error: USER_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -93,14 +94,14 @@ export class UserService {
           username: otherInputs.username,
         });
         if (user) {
-          return { ok: false, error: USER_ERR.usernameExists };
+          return { ok: false, error: USER_ERR.UsernameExists };
         }
       }
       console.log(password, newPassword, otherInputs);
       if (isUpdatingPassword) {
         const isMatch = await currentUser.verifyPassword(password);
         if (!isMatch) {
-          return { ok: false, error: USER_ERR.wrongPassword };
+          return { ok: false, error: USER_ERR.WrongCredentials };
         }
         await this.userRepo.save(
           this.userRepo.create({
@@ -115,7 +116,7 @@ export class UserService {
       return { ok: true };
     } catch (error) {
       console.log(error);
-      return { ok: false, error: USER_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -135,17 +136,17 @@ export class UserService {
           { select: ['id', 'password', 'username'] },
         );
         if (!user) {
-          return { ok: false, error: USER_ERR.userNotFound };
+          return { ok: false, error: USER_ERR.WrongCredentials };
         }
       }
       const isMatch = await user.verifyPassword(password);
       if (!isMatch) {
-        return { ok: false, error: USER_ERR.wrongPassword };
+        return { ok: false, error: USER_ERR.WrongCredentials };
       }
       const token = this.jwtService.sign(user.id, rememberMe);
       return { ok: true, token, username: user.username };
     } catch {
-      return { ok: false, error: USER_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -154,7 +155,7 @@ export class UserService {
       const user = await this.userRepo.findOneOrFail({ id });
       return { user };
     } catch {
-      return { error: USER_ERR.failed };
+      return { error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -165,7 +166,7 @@ export class UserService {
         { relations: ['followers'] },
       );
       if (!targetUser) {
-        return { ok: false, error: USER_ERR.userNotFound };
+        return { ok: false, error: USER_ERR.UserNotFound };
       }
       if (!targetUser.followers) {
         targetUser.followers = [user];
@@ -177,7 +178,7 @@ export class UserService {
       ]);
       return { ok: true, targetUserId: targetUser.id };
     } catch (err) {
-      return { ok: false, error: USER_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -188,7 +189,7 @@ export class UserService {
         { relations: ['followers'] },
       );
       if (!targetUser) {
-        return { ok: false, error: USER_ERR.userNotFound };
+        return { ok: false, error: USER_ERR.UserNotFound };
       }
       targetUser.followers = targetUser.followers.filter(
         (follower) => follower.id !== user.id,
@@ -198,7 +199,7 @@ export class UserService {
       ]);
       return { ok: true, targetUserId: targetUser.id };
     } catch {
-      return { ok: false, error: USER_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -219,11 +220,11 @@ export class UserService {
         relations: ['followings'],
       });
       if (!targetUser) {
-        return { ok: false, error: USER_ERR.userNotFound };
+        return { ok: false, error: USER_ERR.UserNotFound };
       }
       return { ok: true, followings: targetUser.followings };
     } catch {
-      return { ok: false, error: USER_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 }

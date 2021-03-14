@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
-import { COMMON_ERR, TRIP_ERR, USER_ERR } from 'src/common/common.constants';
+import { TRIP_ERR } from 'src/errors/trip.errors';
+import { COMMON_ERR } from 'src/errors/common.errors';
+import { USER_ERR } from 'src/errors/user.errors';
 import { Users } from 'src/users/entities/user.entity';
 import { Raw, Repository } from 'typeorm';
 import { CreateTripInput, CreateTripOutput } from './dto/create-trip.dto';
@@ -30,7 +32,7 @@ export class TripService {
       const savedTrip = await this.tripRepo.save(newTrip);
       return { ok: true, tripId: savedTrip.id };
     } catch (err) {
-      return { ok: false, error: TRIP_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -55,7 +57,7 @@ export class TripService {
         },
       );
       if (!targetUser) {
-        return { ok: false, error: USER_ERR.userNotFound };
+        return { ok: false, error: USER_ERR.UserNotFound };
       }
       const isSelf = Boolean(user?.id === targetUser.id);
       const isFollower = Boolean(
@@ -79,7 +81,7 @@ export class TripService {
       return { ok: true, targetUser };
     } catch (err) {
       console.log(err);
-      return { ok: false, error: TRIP_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -107,14 +109,14 @@ export class TripService {
         },
       );
       if (!trip) {
-        return { ok: false, error: TRIP_ERR.tripNotFound };
+        return { ok: false, error: TRIP_ERR.TripNotFound };
       }
       const targetUser = await this.userRepo.findOne(
         { id: trip.travelerId },
         { relations: ['followers'] },
       );
       if (!targetUser) {
-        return { ok: false, error: USER_ERR.userNotFound };
+        return { ok: false, error: USER_ERR.UserNotFound };
       }
       const isSelf = Boolean(user?.id === trip.travelerId);
       const isPublicAllowed = Boolean(
@@ -130,11 +132,11 @@ export class TripService {
         }
         return { ok: true, trip };
       } else {
-        return { ok: false, error: COMMON_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
     } catch (err) {
       console.log(err);
-      return { ok: false, error: TRIP_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -145,15 +147,15 @@ export class TripService {
     try {
       const trip = await this.tripRepo.findOne({ id: tripId });
       if (!trip) {
-        return { ok: false, error: TRIP_ERR.tripNotFound };
+        return { ok: false, error: TRIP_ERR.TripNotFound };
       }
       if (trip.travelerId !== user.id) {
-        return { ok: false, error: COMMON_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
       await this.tripRepo.save([{ id: tripId, ...values }]);
       return { ok: true };
     } catch {
-      return { ok: false, error: TRIP_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -167,10 +169,10 @@ export class TripService {
         { relations: ['steps'] },
       );
       if (!trip) {
-        return { ok: false, error: TRIP_ERR.tripNotFound };
+        return { ok: false, error: TRIP_ERR.TripNotFound };
       }
       if (trip.travelerId !== user.id) {
-        return { ok: false, error: COMMON_ERR.notAuthorized };
+        return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
       let imagesToDelete = [];
       trip.steps.forEach((step) => {
@@ -185,7 +187,7 @@ export class TripService {
       }
     } catch (err) {
       console.log(err);
-      return { ok: false, error: TRIP_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -214,7 +216,7 @@ export class TripService {
       });
       return { ok: true, users, usersCount, trips, tripsCount };
     } catch {
-      return { ok: false, error: TRIP_ERR.failed };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 }
