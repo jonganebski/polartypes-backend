@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { COMMON_ERR } from 'src/errors/common.errors';
 import { USER_ERR } from 'src/errors/user.errors';
 import { JwtService } from 'src/jwt/jwt.service';
-import { Raw, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   CreateAccountInput,
   CreateAccountOutput,
@@ -23,7 +24,6 @@ import {
   UpdateAccountOutput,
 } from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
-import { COMMON_ERR } from 'src/errors/common.errors';
 
 @Injectable()
 export class UserService {
@@ -95,7 +95,6 @@ export class UserService {
           return { ok: false, error: USER_ERR.UsernameExists };
         }
       }
-      console.log(password, newPassword, otherInputs);
       if (isUpdatingPassword) {
         const isMatch = await currentUser.verifyPassword(password);
         if (!isMatch) {
@@ -124,23 +123,15 @@ export class UserService {
     rememberMe,
   }: LoginInput): Promise<LoginOutput> {
     try {
-      let user = await this.userRepo.findOne(
-        { email: usernameOrEmail },
-        { select: ['id', 'password', 'username'] },
-      );
-      if (!user) {
-        user = await this.userRepo.findOne(
-          { username: usernameOrEmail },
-          { select: ['id', 'password', 'username'] },
-        );
-        if (!user) {
-          return { ok: false, error: USER_ERR.WrongCredentials };
-        }
-      }
+      const user = await this.userRepo.findOne({
+        where: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
+        select: ['id', 'username'],
+      });
+      if (!user) return { ok: false, error: USER_ERR.WrongCredentials };
+
       const isMatch = await user.verifyPassword(password);
-      if (!isMatch) {
-        return { ok: false, error: USER_ERR.WrongCredentials };
-      }
+      if (!isMatch) return { ok: false, error: USER_ERR.WrongCredentials };
+
       const token = this.jwtService.sign(user.id, rememberMe);
       return { ok: true, token, username: user.username };
     } catch {
