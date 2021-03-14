@@ -1,23 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { AwsS3Module } from './aws-s3/aws-s3.module';
-import { CommentModule } from './comment/comment.module';
-import { Comment } from './comment/entities/comment.entity';
-import { CommonModule } from './common/common.module';
-import { JwtModule } from './jwt/jwt.module';
-import { Like } from './step/entities/like.entity';
-import { Step } from './step/entities/step.entity';
-import { StepModule } from './step/step.module';
-import { Trip } from './trip/entities/trip.entity';
-import { TripsModule } from './trip/trip.module';
-import { Users } from './users/entities/user.entity';
-import { UsersModule } from './users/user.module';
+import { AuthModule } from 'src/auth/auth.module';
+import { CommentModule } from 'src/comment/comment.module';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { CommonModule } from 'src/common/common.module';
+import { JwtModule } from 'src/jwt/jwt.module';
+import { Like } from 'src/step/entities/like.entity';
+import { Step } from 'src/step/entities/step.entity';
+import { StepModule } from 'src/step/step.module';
+import { Trip } from 'src/trip/entities/trip.entity';
+import { TripsModule } from 'src/trip/trip.module';
+import { Users } from 'src/users/entities/user.entity';
+import { UsersModule } from 'src/users/user.module';
+import { UserService } from 'src/users/user.service';
+import { SeederService } from './seeder.service';
 
 @Module({
   imports: [
@@ -36,24 +34,8 @@ import { UsersModule } from './users/user.module';
         POSTGRES_PASSWORD: Joi.string(),
         POSTGRES_DATABASE: Joi.string(),
         JWT_PRIVATE_KEY: Joi.string().required(),
-        AWS_S3_ACCESS_KEY_ID: Joi.string().required(),
-        AWS_S3_SECRET_ACCESS_KEY: Joi.string().required(),
-        AWS_S3_BUCKET_NAME: Joi.string().required(),
+        SEED_USER_PASSWORD: Joi.string().required(),
       }),
-    }),
-    GraphQLModule.forRoot({
-      autoSchemaFile: true,
-      installSubscriptionHandlers: true,
-      playground: process.env.NODE_ENV !== 'production',
-      context: ({ req, connection }) => {
-        const TOKEN_KEY = 'x-jwt';
-        if (req) {
-          return { token: req.headers[TOKEN_KEY] };
-        }
-        if (connection) {
-          return { token: connection.context[TOKEN_KEY] };
-        }
-      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -72,16 +54,15 @@ import { UsersModule } from './users/user.module';
         process.env.NODE_ENV !== 'test',
       entities: [Users, Trip, Step, Comment, Like], // typeORM will only take care of these entities.
     }),
+    TypeOrmModule.forFeature([Users]),
     JwtModule.forRoot({ jwtPrivateKey: process.env.JWT_PRIVATE_KEY }),
     UsersModule,
     TripsModule,
     CommentModule,
     StepModule,
     CommonModule,
-    AwsS3Module,
     AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [SeederService, UserService],
 })
-export class AppModule {}
+export class SeederModule {}

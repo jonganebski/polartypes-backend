@@ -43,7 +43,7 @@ export class UserService {
       if (existUser) {
         return { ok: false, error: USER_ERR.EmailExists };
       }
-      let username = firstName + lastName;
+      let username = (firstName + lastName).replace(/[" "]/g, '');
       let slug = username.toLowerCase();
       let number = 1;
       while (true) {
