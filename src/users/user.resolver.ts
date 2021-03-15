@@ -20,9 +20,9 @@ import {
 import { FollowInput, FollowOutput } from './dto/follow.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
 import {
-  ReadFollowingsInput,
-  ReadFollowingsOutput,
-} from './dto/read-followings.dto';
+  ListFollowingsInput,
+  ListFollowingsOutput,
+} from './dto/list-followings.dto';
 import { UnfollowInput, UnfollowOutput } from './dto/unfollow.dto';
 import {
   UpdateAccountInput,
@@ -30,6 +30,10 @@ import {
 } from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
 import { UserService } from './user.service';
+import {
+  ListFollowersInput,
+  ListFollowersOutput,
+} from './dto/list-followers.dto';
 
 @Resolver(Users)
 export class UserResolver {
@@ -92,11 +96,19 @@ export class UserResolver {
   }
 
   @Access('Signedin')
-  @Query(() => ReadFollowingsOutput)
-  readFollowings(
-    @Args('input') readFollowingsInput: ReadFollowingsInput,
-  ): Promise<ReadFollowingsOutput> {
-    return this.userService.readFollowings(readFollowingsInput);
+  @Query(() => ListFollowingsOutput)
+  listFollowings(
+    @Args('input') listFollowingsInput: ListFollowingsInput,
+  ): Promise<ListFollowingsOutput> {
+    return this.userService.listFollowings(listFollowingsInput);
+  }
+
+  @Access('Signedin')
+  @Query(() => ListFollowersOutput)
+  listFollowers(
+    @Args('input') listFollowersInput: ListFollowersInput,
+  ): Promise<ListFollowersOutput> {
+    return this.userService.listFollowers(listFollowersInput);
   }
 
   // ====== Resolved Fields =======

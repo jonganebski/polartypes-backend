@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommentResolver } from 'src/comment/comment.resolver';
 import { COMMON_ERR } from 'src/errors/common.errors';
 import { USER_ERR } from 'src/errors/user.errors';
 import { JwtService } from 'src/jwt/jwt.service';
@@ -16,15 +15,19 @@ import {
 import { FollowInput, FollowOutput } from './dto/follow.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
 import {
-  ReadFollowingsInput,
-  ReadFollowingsOutput,
-} from './dto/read-followings.dto';
+  ListFollowingsInput,
+  ListFollowingsOutput,
+} from './dto/list-followings.dto';
 import { UnfollowInput, UnfollowOutput } from './dto/unfollow.dto';
 import {
   UpdateAccountInput,
   UpdateAccountOutput,
 } from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
+import {
+  ListFollowersInput,
+  ListFollowersOutput,
+} from './dto/list-followers.dto';
 
 @Injectable()
 export class UserService {
@@ -68,7 +71,7 @@ export class UserService {
         }),
       );
       const token = this.jwtService.sign(savedUser.id, false);
-      return { ok: true, token, username };
+      return { ok: true, token, slug };
     } catch (err) {
       console.log(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
@@ -149,10 +152,10 @@ export class UserService {
     }
   }
 
-  async follow(user: Users, { id }: FollowInput): Promise<FollowOutput> {
+  async follow(user: Users, { slug }: FollowInput): Promise<FollowOutput> {
     try {
       const targetUser = await this.userRepo.findOne({
-        where: { id },
+        where: { slug },
         select: ['id'],
         relations: ['followers'],
       });
@@ -161,18 +164,21 @@ export class UserService {
       targetUser.followers = [...targetUser.followers, user];
 
       await this.userRepo.save([
-        { id, ...targetUser, followers: targetUser.followers },
+        { slug, ...targetUser, followers: targetUser.followers },
       ]);
-      return { ok: true, targetUserId: targetUser.id };
+      return { ok: true, slug };
     } catch (err) {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
-  async unfollow(user: Users, { id }: UnfollowInput): Promise<UnfollowOutput> {
+  async unfollow(
+    user: Users,
+    { slug }: UnfollowInput,
+  ): Promise<UnfollowOutput> {
     try {
       const targetUser = await this.userRepo.findOne({
-        where: { id },
+        where: { slug },
         select: ['id'],
         relations: ['followers'],
       });
@@ -183,9 +189,9 @@ export class UserService {
       );
 
       await this.userRepo.save([
-        { id, ...targetUser, followers: targetUser.followers },
+        { slug, ...targetUser, followers: targetUser.followers },
       ]);
-      return { ok: true, targetUserId: targetUser.id };
+      return { ok: true, slug };
     } catch {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
@@ -207,19 +213,61 @@ export class UserService {
     }
   }
 
-  // Need refactoring to all followers/following logic
-  async readFollowings({
-    targetUserId,
-  }: ReadFollowingsInput): Promise<ReadFollowingsOutput> {
+  async listFollowings({
+    slug,
+    cursorId,
+  }: ListFollowingsInput): Promise<ListFollowingsOutput> {
     try {
-      const targetUser = await this.userRepo.findOne({
-        where: { id: targetUserId },
-        relations: ['followings'],
-      });
-      if (!targetUser) {
-        return { ok: false, error: USER_ERR.UserNotFound };
-      }
-      return { ok: true, followings: targetUser.followings };
+      const take = 10;
+      const [followings, count] = await this.userRepo
+        .createQueryBuilder('user')
+        .leftJoin('user.followers', 'follower')
+        .where('follower.slug = :slug', { slug })
+        .andWhere('user.id < :cursorId', {
+          cursorId: cursorId ?? Math.pow(2, 31) - 1,
+        })
+        .orderBy('user.id', 'DESC')
+        .take(take)
+        .getManyAndCount();
+
+      return {
+        ok: true,
+        user: { slug, followings },
+        endCursorId: followings[followings.length - 1].id,
+        hasNextPage: 0 < count - take,
+      };
+    } catch (err) {
+      console.log(err);
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
+    }
+  }
+
+  async listFollowers({
+    slug,
+    cursorId,
+  }: ListFollowersInput): Promise<ListFollowersOutput> {
+    try {
+      const take = 10;
+      const [followers, count] = await this.userRepo
+        .createQueryBuilder('user')
+        .leftJoin('user.followings', 'following')
+        .where('following.slug = :slug', { slug })
+        .andWhere('user.id < :cursorId', {
+          cursorId: cursorId ?? Math.pow(2, 31) - 1,
+        })
+        .orderBy('user.id', 'DESC')
+        .take(take)
+        .getManyAndCount();
+
+      return {
+        ok: true,
+        user: {
+          slug,
+          followers,
+        },
+        endCursorId: followers[followers.length - 1].id,
+        hasNextPage: 0 < count - take,
+      };
     } catch (err) {
       console.log(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
@@ -243,7 +291,7 @@ export class UserService {
   }
 
   async isFollowing(rootUser: Users, authUser: Users): Promise<boolean> {
-    if (authUser) {
+    if (authUser && rootUser.id !== authUser.id) {
       const count = await this.userRepo
         .createQueryBuilder('rootUser')
         .innerJoin('rootUser.followers', 'follower')
@@ -255,7 +303,7 @@ export class UserService {
     return false;
   }
   async isFollower(rootUser: Users, authUser: Users): Promise<boolean> {
-    if (authUser) {
+    if (authUser && rootUser.id !== authUser.id) {
       const count = await this.userRepo
         .createQueryBuilder('rootUser')
         .innerJoin('rootUser.followings', 'following')
