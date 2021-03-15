@@ -125,6 +125,12 @@ export class UserResolver {
 
   @Access('Signedin')
   @ResolveField(() => Boolean)
+  isMe(@Root() rootUser: Users, @AuthUser() authUser: Users) {
+    return rootUser.id === authUser.id;
+  }
+
+  @Access('Signedin')
+  @ResolveField(() => Boolean)
   async isFollowing(
     @Root() rootUser: Users,
     @AuthUser() authUser: Users,
