@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { COMMON_ERR } from 'src/errors/common.errors';
 import { STEP_ERR } from 'src/errors/step.errors';
 import { Trip } from 'src/trip/entities/trip.entity';
@@ -17,6 +18,8 @@ export class StepService {
   constructor(
     @InjectRepository(Step) private readonly stepRepo: Repository<Step>,
     @InjectRepository(Trip) private readonly tripRepo: Repository<Trip>,
+    @InjectRepository(Comment)
+    private readonly commentRepo: Repository<Comment>,
   ) {}
 
   async createStep(
@@ -73,6 +76,14 @@ export class StepService {
     } catch {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
+  }
+
+  async countComments(step: Step) {
+    return this.commentRepo
+      .createQueryBuilder('comment')
+      .leftJoin('comment.step', 'step')
+      .where('step.id = :id', { id: step.id })
+      .getCount();
   }
 }
 

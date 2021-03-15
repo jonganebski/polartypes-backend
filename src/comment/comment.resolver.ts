@@ -11,7 +11,7 @@ import {
   DeleteCommentInput,
   DeleteCommentOutput,
 } from './dto/delete-comment.dto';
-import { ReadCommentsInput, ReadCommentsOutput } from './dto/read-comments.dto';
+import { ListCommentsInput, ListCommentsOutput } from './dto/list-comments.dto';
 
 @Resolver()
 export class CommentResolver {
@@ -27,11 +27,11 @@ export class CommentResolver {
   }
 
   @Access('Any')
-  @Query(() => ReadCommentsOutput)
-  readComments(
-    @Args('input') readCommentsInput: ReadCommentsInput,
-  ): Promise<ReadCommentsOutput> {
-    return this.commentService.readComments(readCommentsInput);
+  @Query(() => ListCommentsOutput)
+  listComments(
+    @Args('input') listCommentsInput: ListCommentsInput,
+  ): Promise<ListCommentsOutput> {
+    return this.commentService.listComments(listCommentsInput);
   }
 
   @Access('Signedin')

@@ -233,7 +233,7 @@ export class UserService {
       return {
         ok: true,
         user: { slug, followings },
-        endCursorId: followings[followings.length - 1].id,
+        endCursorId: followings[followings.length - 1]?.id ?? null,
         hasNextPage: 0 < count - take,
       };
     } catch (err) {
@@ -265,7 +265,7 @@ export class UserService {
           slug,
           followers,
         },
-        endCursorId: followers[followers.length - 1].id,
+        endCursorId: followers[followers.length - 1]?.id ?? null,
         hasNextPage: 0 < count - take,
       };
     } catch (err) {

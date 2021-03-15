@@ -11,7 +11,7 @@ import {
   DeleteCommentInput,
   DeleteCommentOutput,
 } from './dto/delete-comment.dto';
-import { ReadCommentsInput, ReadCommentsOutput } from './dto/read-comments.dto';
+import { ListCommentsInput, ListCommentsOutput } from './dto/list-comments.dto';
 import { Comment } from './entities/comment.entity';
 
 @Injectable()
@@ -43,18 +43,30 @@ export class CommentService {
     }
   }
 
-  async readComments({
+  async listComments({
+    cursorId,
     stepId,
-  }: ReadCommentsInput): Promise<ReadCommentsOutput> {
+  }: ListCommentsInput): Promise<ListCommentsOutput> {
     try {
-      const step = await this.stepRepo.findOne(
-        { id: stepId },
-        { relations: ['comments', 'comments.creator'] },
-      );
-      if (!step) {
-        return { ok: false, error: 'Step not found.' };
-      }
-      return { ok: true, comments: step.comments };
+      const take = 10;
+      const [comments, count] = await this.commentRepo
+        .createQueryBuilder('comment')
+        .leftJoin('comment.step', 'step')
+        .where('step.id = :id', { id: stepId })
+        .andWhere('comment.id < :cursorId', {
+          cursorId: cursorId ?? Math.pow(2, 31) - 1,
+        })
+        .leftJoinAndSelect('comment.creator', 'creator')
+        .orderBy('comment.createdAt', 'DESC')
+        .take(take)
+        .getManyAndCount();
+
+      return {
+        ok: true,
+        step: { id: stepId, comments },
+        endCursorId: comments[comments.length - 1]?.id ?? null,
+        hasMorePages: 0 < count - take,
+      };
     } catch (err) {
       console.log(err);
       return { ok: false, error: 'Failed to load comments.' };

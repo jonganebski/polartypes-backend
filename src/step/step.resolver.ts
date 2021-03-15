@@ -1,4 +1,11 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  ResolveField,
+  Resolver,
+  Root,
+} from '@nestjs/graphql';
 import { Access } from 'src/auth/access.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Users } from 'src/users/entities/user.entity';
@@ -6,9 +13,10 @@ import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dto/toggle-like.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
+import { Step } from './entities/step.entity';
 import { LikeService, StepService } from './step.service';
 
-@Resolver()
+@Resolver(() => Step)
 export class StepResolver {
   constructor(private readonly stepService: StepService) {}
 
@@ -37,6 +45,11 @@ export class StepResolver {
     @Args('input') deleteStepInput: DeleteStepInput,
   ): Promise<DeleteStepOutput> {
     return this.stepService.deleteStep(user, deleteStepInput);
+  }
+
+  @ResolveField(() => Int)
+  async countComments(@Root() step: Step) {
+    return this.stepService.countComments(step);
   }
 }
 
