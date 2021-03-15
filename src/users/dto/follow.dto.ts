@@ -3,10 +3,10 @@ import { CoreOutput } from 'src/common/dto/common-output.dto';
 import { Users } from '../entities/user.entity';
 
 @InputType()
-export class FollowInput extends PickType(Users, ['id']) {}
+export class FollowInput extends PickType(Users, ['slug']) {}
 
 @ObjectType()
 export class FollowOutput extends CoreOutput {
-  @Field(() => Number, { nullable: true })
-  targetUserId?: number;
+  @Field(() => String, { nullable: true })
+  slug?: string;
 }

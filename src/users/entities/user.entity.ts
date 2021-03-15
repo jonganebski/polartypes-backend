@@ -35,7 +35,6 @@ export class Users extends CoreEntity {
   }
 
   async verifyPassword(inputPassword: string): Promise<boolean> {
-    console.log(this.password, inputPassword);
     try {
       if (await argon2.verify(this.password, inputPassword)) {
         return true;

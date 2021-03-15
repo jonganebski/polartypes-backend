@@ -7,7 +7,7 @@ import { Users } from 'src/users/entities/user.entity';
 export class ReadTripsInput {
   @Field(() => String)
   @IsString()
-  targetUsername: string;
+  slug: string;
 }
 
 @ObjectType()

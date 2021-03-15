@@ -13,6 +13,7 @@ import { ReadTripsInput, ReadTripsOutput } from './dto/read-trips.dto';
 import { SearchInput, SearchOutput } from './dto/search.dto';
 import { UpdateTripInput, UpdateTripOutput } from './dto/update-trip.dto';
 import { Availability, Trip } from './entities/trip.entity';
+import { UserService } from 'src/users/user.service';
 
 @Injectable()
 export class TripService {
@@ -20,6 +21,7 @@ export class TripService {
     @InjectRepository(Trip) private readonly tripRepo: Repository<Trip>,
     @InjectRepository(Users) private readonly userRepo: Repository<Users>,
     private readonly awsS3Service: AwsS3Service,
+    private readonly userService: UserService,
   ) {}
 
   async createTrip(
@@ -38,21 +40,17 @@ export class TripService {
 
   async readTrips(
     user: Users,
-    { targetUsername }: ReadTripsInput,
+    { slug }: ReadTripsInput,
   ): Promise<ReadTripsOutput> {
     try {
       const targetUser = await this.userRepo.findOne(
-        {
-          slug: targetUsername.toLocaleLowerCase(),
-        },
+        { slug },
         {
           relations: [
             'trips',
             'trips.steps',
             'trips.steps.likes',
             'trips.steps.likes.user',
-            'followers',
-            'followings',
           ],
         },
       );
@@ -60,9 +58,12 @@ export class TripService {
         return { ok: false, error: USER_ERR.UserNotFound };
       }
       const isSelf = Boolean(user?.id === targetUser.id);
-      const isFollower = Boolean(
-        targetUser.followers?.some((follower) => follower.id === user?.id),
-      );
+
+      const isFollower = await this.userService.isFollower(targetUser, user);
+
+      // const isFollower = Boolean(
+      //   targetUser.followers?.some((follower) => follower.id === user?.id),
+      // );
       if (isSelf) {
         // Reading user's own trips. (private)
         return { ok: true, targetUser };

@@ -28,5 +28,5 @@ export class CreateAccountOutput extends CoreOutput {
   token?: string;
 
   @Field(() => String, { nullable: true })
-  username?: string;
+  slug?: string;
 }

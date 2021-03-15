@@ -14,19 +14,19 @@ export class SeederService {
 
   async seed() {
     console.log('🌱 Seeding users...');
-    const usernames: string[] = [];
+    const slugs: string[] = [];
     for (let i = 0; i < 50; i++) {
-      const { username } = await this.userService.createAccount({
+      const { slug } = await this.userService.createAccount({
         email: faker.internet.email(),
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
         password: process.env.SEED_USER_PASSWORD,
       });
-      usernames.push(username);
+      slugs.push(slug);
     }
     const users = await this.userRepo
       .createQueryBuilder('user')
-      .where('user.username IN(:...usernames)', { usernames })
+      .where('user.slug IN(:...slugs)', { slugs })
       .getMany();
 
     for (let i = 0; i < users.length; i++) {
@@ -34,7 +34,7 @@ export class SeederService {
       const otherUsers = users.filter((_, index) => index !== i);
       for (let j = 0; j < otherUsers.length - 1; j++) {
         const otherUser = otherUsers[j];
-        await this.userService.follow(user, { id: otherUser.id });
+        await this.userService.follow(user, { slug: otherUser.slug });
       }
     }
 
