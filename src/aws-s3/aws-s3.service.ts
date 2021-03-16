@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DeleteFilesInput } from './dto/delete-images.dto';
 import { Express } from 'express';
 import { DEFAULT_PORT } from 'src/common/common.constants';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class AwsS3Service {
@@ -59,6 +60,13 @@ export class AwsS3Service {
   async deleteImage({
     urls,
   }: DeleteFilesInput): Promise<{ ok: boolean; error?: string }> {
+    if (process.env.NODE_ENV !== 'production') {
+      for (let i = 0; i < urls.length; i++) {
+        const filename = urls[i].split('/static/')[1];
+        unlinkSync(`${process.cwd()}/src/uploads/${filename}`);
+      }
+      return { ok: true };
+    }
     aws.config.update({
       credentials: {
         accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
