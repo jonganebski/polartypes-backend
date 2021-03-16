@@ -46,12 +46,7 @@ export class TripService {
       const targetUser = await this.userRepo.findOne(
         { slug },
         {
-          relations: [
-            'trips',
-            'trips.steps',
-            'trips.steps.likes',
-            'trips.steps.likes.user',
-          ],
+          relations: ['trips', 'trips.steps'],
         },
       );
       if (!targetUser) {
@@ -91,24 +86,10 @@ export class TripService {
     { tripId }: ReadTripInput,
   ): Promise<ReadTripOutput> {
     try {
-      const trip = await this.tripRepo.findOne(
-        {
-          id: tripId,
-        },
-        {
-          relations: [
-            'steps',
-            'steps.traveler',
-            'steps.likes',
-            'steps.likes.user',
-            'steps.comments',
-            'steps.comments.creator',
-            'traveler',
-            'traveler.followers',
-            'traveler.followings',
-          ],
-        },
-      );
+      const trip = await this.tripRepo.findOne({
+        where: { id: tripId },
+        relations: ['steps', 'traveler'],
+      });
       if (!trip) {
         return { ok: false, error: TRIP_ERR.TripNotFound };
       }

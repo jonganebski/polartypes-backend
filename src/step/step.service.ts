@@ -8,6 +8,7 @@ import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
+import { LikesInfoOutput } from './dto/likes-info.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dto/toggle-like.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
 import { Like } from './entities/like.entity';
@@ -18,6 +19,7 @@ export class StepService {
   constructor(
     @InjectRepository(Step) private readonly stepRepo: Repository<Step>,
     @InjectRepository(Trip) private readonly tripRepo: Repository<Trip>,
+    @InjectRepository(Like) private readonly likeRepo: Repository<Like>,
     @InjectRepository(Comment)
     private readonly commentRepo: Repository<Comment>,
   ) {}
@@ -84,6 +86,26 @@ export class StepService {
       .leftJoin('comment.step', 'step')
       .where('step.id = :id', { id: step.id })
       .getCount();
+  }
+
+  async likesInfo(step: Step): Promise<LikesInfoOutput> {
+    const take = 3;
+    const [likes, count] = await this.likeRepo.findAndCount({
+      where: { stepId: step.id },
+      relations: ['user'],
+      take,
+    });
+    return { samples: likes, totalCount: count };
+  }
+
+  async didILiked(step: Step, authUser: Users) {
+    if (!authUser) return false;
+
+    return Boolean(
+      await this.likeRepo.count({
+        where: { userId: authUser.id, stepId: step.id },
+      }),
+    );
   }
 }
 

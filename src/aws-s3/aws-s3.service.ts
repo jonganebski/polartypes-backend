@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as aws from 'aws-sdk';
+import { unlinkSync } from 'fs';
+import { DEFAULT_PORT } from 'src/common/common.constants';
 import { v4 as uuidv4 } from 'uuid';
 import { DeleteFilesInput } from './dto/delete-images.dto';
-import { Express } from 'express';
-import { DEFAULT_PORT } from 'src/common/common.constants';
-import { unlinkSync } from 'fs';
 
 @Injectable()
 export class AwsS3Service {

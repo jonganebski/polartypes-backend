@@ -11,6 +11,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Users } from 'src/users/entities/user.entity';
 import { CreateStepInput, CreateStepOutput } from './dto/create-step.dto';
 import { DeleteStepInput, DeleteStepOutput } from './dto/delete-step.dto';
+import { LikesInfoOutput } from './dto/likes-info.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dto/toggle-like.dto';
 import { UpdateStepInput, UpdateStepOutput } from './dto/update-step.dto';
 import { Step } from './entities/step.entity';
@@ -50,6 +51,17 @@ export class StepResolver {
   @ResolveField(() => Int)
   async countComments(@Root() step: Step) {
     return this.stepService.countComments(step);
+  }
+
+  @ResolveField(() => LikesInfoOutput)
+  async likesInfo(@Root() step: Step): Promise<LikesInfoOutput> {
+    return this.stepService.likesInfo(step);
+  }
+
+  @Access('Signedin')
+  @ResolveField(() => Boolean)
+  async didILiked(@Root() step: Step, @AuthUser() authUser: Users) {
+    return this.stepService.didILiked(step, authUser);
   }
 }
 

@@ -8,9 +8,10 @@ import { ReadTripInput, ReadTripOutput } from './dto/read-trip.dto';
 import { ReadTripsInput, ReadTripsOutput } from './dto/read-trips.dto';
 import { SearchInput, SearchOutput } from './dto/search.dto';
 import { UpdateTripInput, UpdateTripOutput } from './dto/update-trip.dto';
+import { Trip } from './entities/trip.entity';
 import { TripService } from './trip.service';
 
-@Resolver()
+@Resolver(() => Trip)
 export class TripResolver {
   constructor(private readonly tripService: TripService) {}
 
