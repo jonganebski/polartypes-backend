@@ -3,18 +3,16 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { AuthModule } from 'src/auth/auth.module';
+import { AwsS3Module } from 'src/aws-s3/aws-s3.module';
 import { CommentModule } from 'src/comment/comment.module';
-import { CommentService } from 'src/comment/comment.service';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { CommonModule } from 'src/common/common.module';
 import { JwtModule } from 'src/jwt/jwt.module';
 import { Like } from 'src/step/entities/like.entity';
 import { Step } from 'src/step/entities/step.entity';
 import { StepModule } from 'src/step/step.module';
-import { LikeService, StepService } from 'src/step/step.service';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { TripsModule } from 'src/trip/trip.module';
-import { TripService } from 'src/trip/trip.service';
 import { Users } from 'src/users/entities/user.entity';
 import { UsersModule } from 'src/users/user.module';
 import { UserService } from 'src/users/user.service';
@@ -40,6 +38,7 @@ import { SeederService } from './seeder.service';
         SUPERUSER_EMAIL: Joi.string().required(),
         SUPERUSER_FIRSTNAME: Joi.string().required(),
         SUPERUSER_LASTNAME: Joi.string().required(),
+        SUPERUSER_TIMEZONE: Joi.string().required(),
         SUPERUSER_PASSWORD: Joi.string().required(),
         SEED_USER_PASSWORD: Joi.string().required(),
       }),
@@ -61,7 +60,7 @@ import { SeederService } from './seeder.service';
         process.env.NODE_ENV !== 'test',
       entities: [Users, Trip, Step, Comment, Like], // typeORM will only take care of these entities.
     }),
-    TypeOrmModule.forFeature([Users, Like, Step, Comment]),
+    TypeOrmModule.forFeature([Users, Like, Step, Comment, Trip]),
     JwtModule.forRoot({ jwtPrivateKey: process.env.JWT_PRIVATE_KEY }),
     UsersModule,
     TripsModule,
@@ -69,7 +68,8 @@ import { SeederService } from './seeder.service';
     StepModule,
     CommonModule,
     AuthModule,
+    AwsS3Module,
   ],
-  providers: [SeederService, UserService, TripService],
+  providers: [SeederService, UserService],
 })
 export class SeederModule {}
