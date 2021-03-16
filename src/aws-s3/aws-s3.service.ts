@@ -2,15 +2,26 @@ import { Injectable } from '@nestjs/common';
 import * as aws from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { DeleteFilesInput } from './dto/delete-images.dto';
+import { Express } from 'express';
+import { DEFAULT_PORT } from 'src/common/common.constants';
 
 @Injectable()
 export class AwsS3Service {
   async uploadImage(
-    file,
+    file: Express.Multer.File,
   ): Promise<{ ok: boolean; error?: string; url?: string }> {
-    const maxSize = 1 * 1024 * 1024; // 1mb
+    if (process.env.NODE_ENV !== 'production') {
+      return {
+        ok: true,
+        url: `http://localhost:${process.env.PORT ?? DEFAULT_PORT}/static/${
+          file.filename
+        }`,
+      };
+    }
+
+    const maxSize = 3 * 1024 * 1024; // 3mb
     if (maxSize < file.size) {
-      return { ok: false, error: 'File size limit is 1 MB.' };
+      return { ok: false, error: 'File size limit is 3 MB.' };
     }
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
     if (!validTypes.includes(file.mimetype)) {
@@ -21,6 +32,7 @@ export class AwsS3Service {
           .join(', ')} files are accepted.`,
       };
     }
+
     aws.config.update({
       credentials: {
         accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,

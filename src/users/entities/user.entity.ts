@@ -83,7 +83,7 @@ export class Users extends CoreEntity {
 
   @Field(() => String, { nullable: true }) // just for now
   @Column({ nullable: true })
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   avatarUrl?: string;
 
   @Field(() => String, { nullable: true })

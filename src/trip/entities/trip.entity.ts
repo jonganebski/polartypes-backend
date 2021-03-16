@@ -5,7 +5,6 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import {
-  IsDateString,
   IsISO8601,
   IsNumber,
   IsOptional,

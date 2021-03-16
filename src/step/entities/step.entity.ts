@@ -53,7 +53,7 @@ export class Step extends CoreEntity {
   @Field(() => [String], { nullable: true })
   @Column('text', { array: true, nullable: true })
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsUrl({ require_tld: false }, { each: true })
   imgUrls?: string[];
 
   // likes

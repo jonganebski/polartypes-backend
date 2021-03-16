@@ -155,7 +155,8 @@ export class TripService {
       }
       await this.tripRepo.save([{ id: tripId, ...values }]);
       return { ok: true };
-    } catch {
+    } catch (err) {
+      console.log(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
