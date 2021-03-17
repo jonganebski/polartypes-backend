@@ -73,7 +73,7 @@ export class UserService {
       const token = this.jwtService.sign(savedUser.id, false);
       return { ok: true, token, slug };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
@@ -116,7 +116,7 @@ export class UserService {
       }
       return { ok: true };
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
@@ -237,7 +237,7 @@ export class UserService {
         hasNextPage: 0 < count - take,
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
@@ -269,7 +269,7 @@ export class UserService {
         hasNextPage: 0 < count - take,
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }

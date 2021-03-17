@@ -34,15 +34,20 @@ import {
   ListFollowersInput,
   ListFollowersOutput,
 } from './dto/list-followers.dto';
+import { WhoAmIOutput } from './dto/whoAmI.dto';
+import { USER_ERR } from 'src/errors/user.errors';
 
 @Resolver(Users)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Access('Signedin')
-  @Query(() => Users)
-  whoAmI(@AuthUser() user: Users): Users {
-    return user;
+  @Query(() => WhoAmIOutput)
+  whoAmI(@AuthUser() user: Users): WhoAmIOutput {
+    if (!user) {
+      return { ok: false, error: USER_ERR.UserNotFound };
+    }
+    return { ok: true, user };
   }
 
   @Access('Any')

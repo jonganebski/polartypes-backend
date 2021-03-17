@@ -79,7 +79,7 @@ export class TripService {
 
       return { ok: true, targetUser };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
@@ -115,7 +115,7 @@ export class TripService {
 
       return { ok: true, trip };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
@@ -135,7 +135,7 @@ export class TripService {
       await this.tripRepo.save([{ id: tripId, ...values }]);
       return { ok: true };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
@@ -167,7 +167,7 @@ export class TripService {
         return { ok: true };
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }

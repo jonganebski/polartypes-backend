@@ -67,6 +67,8 @@ export class SeederService {
         lastName,
         username,
         slug,
+        city: 'Seoul',
+        about: "I'm a developer of this site.",
         timeZone: process.env.SUPERUSER_TIMEZONE,
         password: process.env.SUPERUSER_PASSWORD,
       });
@@ -159,7 +161,7 @@ export class SeederService {
     console.log('🌱 Seeding likes...');
     try {
       for (let i = 0; i < this.users.length; i++) {
-        const targetSteps = faker.random.arrayElements(this.steps, 2);
+        const targetSteps = faker.random.arrayElements(this.steps, 5);
         for (let j = 0; j < targetSteps.length; j++) {
           const like = await this.likeRepo.create({
             user: this.users[i],

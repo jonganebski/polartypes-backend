@@ -19,6 +19,8 @@ export const UPLOAD_BASE_URL =
     ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/example`
     : `http://localhost:4000/static/example`;
 
+const paragraphSeparator = '\n \n';
+
 const formatImageUrls = (filenames: string[]) =>
   filenames.map((filename) => `${UPLOAD_BASE_URL}/${filename}`);
 
@@ -44,7 +46,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 119.586319,
     timeZone: 'Asia/Shanghai',
     imgUrls: formatImageUrls(['DSCF0121.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
   },
   {
     country: 'Mongolia',
@@ -55,7 +60,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 106.917702,
     timeZone: 'Asia/Ulaanbaatar',
     imgUrls: formatImageUrls(['DSCF0600.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
   },
   {
     country: 'Mongolia',
@@ -66,7 +74,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 101.462434,
     timeZone: 'Asia/Ulaanbaatar',
     imgUrls: formatImageUrls(['DSCF9056.jpg', 'DSCF9068.jpg', 'DSCF9098.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
   },
   {
     country: 'Mongolia',
@@ -77,7 +88,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 96.252087,
     timeZone: 'Asia/Hovd',
     imgUrls: formatImageUrls(['DSCF9134.jpg', 'DSCF9201.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
   },
   {
     country: 'Russia',
@@ -93,7 +107,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
       'DSCF9375.jpg',
       'DSCF9393.jpg',
     ]),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -104,7 +121,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 76.945728,
     timeZone: 'Asia/Almaty',
     imgUrls: formatImageUrls(['DSCF9558.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -115,7 +135,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 74.607008,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9598.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -126,7 +149,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 77.838353,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9710.jpg', 'DSCF9747.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -137,7 +163,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 77.66959,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9762.jpg', 'DSCF9763.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -148,7 +177,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 76.00578,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9832.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -159,7 +191,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 74.957758,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9855.jpg', 'DSCF9861.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -170,7 +205,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 75.155105,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9888.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -181,7 +219,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 75.032629,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9939.jpg', 'DSCF9948.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -192,7 +233,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 74.607008,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9972.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -203,7 +247,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 73.797768,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF9990.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -214,7 +261,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 73.054088,
     timeZone: 'Asia/Bishkek',
     imgUrls: formatImageUrls(['DSCF0001.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -230,7 +280,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
       'DSCF0136.jpg',
       'DSCF0205.jpg',
     ]),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -241,7 +294,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 64.423133,
     timeZone: 'Asia/Samarkand',
     imgUrls: formatImageUrls(['DSCF0353.jpg', 'DSCF0362.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -257,7 +313,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
       'DSCF0460.jpg',
       'DSCF0462.jpg',
     ]),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -268,7 +327,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 49.832675,
     timeZone: 'Asia/Baku',
     imgUrls: formatImageUrls(['DSCF0482.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -279,7 +341,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 51.3896,
     timeZone: 'Asia/Tehran',
     imgUrls: formatImageUrls(['DSCF0487.jpg', 'DSCF0498.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -295,7 +360,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
       'DSCF0566.jpg',
       'DSCF0573.jpg',
     ]),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -306,7 +374,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 56.46417,
     timeZone: 'Asia/Tehran',
     imgUrls: formatImageUrls(['DSCF0651.jpg', 'DSCF0674.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -317,7 +388,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 46.296195,
     timeZone: 'Asia/Tehran',
     imgUrls: formatImageUrls(['DSCF0741.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -328,18 +402,24 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 44.512585,
     timeZone: 'Asia/Yerevan',
     imgUrls: formatImageUrls(['DSCF0757.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
     country: 'Georgia',
     location: 'Tbilisi',
-    arrivedAt: '2019-04-26T11:30:00',
+    arrivedAt: '2019-05-26T11:30:00',
     lat: 41.693459,
     lon: 44.801449,
     timeZone: 'Asia/Tbilisi',
     imgUrls: formatImageUrls(['DSCF0773.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -350,7 +430,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 42.725318,
     timeZone: 'Asia/Tbilisi',
     imgUrls: formatImageUrls(['DSCF0889.jpg', 'DSCF0948.jpg', 'DSCF0957.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -361,7 +444,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 42.977486,
     timeZone: 'Asia/Tbilisi',
     imgUrls: formatImageUrls(['DSCF1001.jpg', 'DSCF1022.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -372,7 +458,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 43.484304,
     timeZone: 'Asia/Tbilisi',
     imgUrls: formatImageUrls(['DSCF1094.jpg', 'DSCF1114.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -383,7 +472,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 44.111781,
     timeZone: 'Asia/Tbilisi',
     imgUrls: formatImageUrls(['DSCF1133.jpg', 'DSCF1152.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -394,7 +486,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 45.274179,
     timeZone: 'Asia/Tbilisi',
     imgUrls: formatImageUrls(['DSCF1280.jpg', 'DSCF1287.jpg', 'DSCF1289.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -405,7 +500,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 41.636009,
     timeZone: 'Asia/Tbilisi',
     imgUrls: formatImageUrls(['DSCF1437.jpg', 'DSCF1450.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -416,7 +514,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 24.74993,
     timeZone: 'Europe/Sofia',
     imgUrls: formatImageUrls(['DSCF1504.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -427,7 +528,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 23.398844,
     timeZone: 'Europe/Sofia',
     imgUrls: formatImageUrls(['DSCF1589.jpg', 'DSCF1594.jpg', 'DSCF1600.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -438,7 +542,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 21.404157,
     timeZone: 'Europe/Skopje',
     imgUrls: formatImageUrls(['DSCF1731.jpg', 'DSCF1747.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -449,7 +556,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 19.559949,
     timeZone: 'Europe/Tirane',
     imgUrls: formatImageUrls(['DSCF1784.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -460,7 +570,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 19.050991,
     timeZone: 'Europe/Podgorica',
     imgUrls: formatImageUrls(['DSCF1823.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -471,7 +584,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 17.809994,
     timeZone: 'Europe/Sarajevo',
     imgUrls: formatImageUrls(['DSCF1855.jpg', 'DSCF1857.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -482,7 +598,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 16.691289,
     timeZone: 'Europe/Zagreb',
     imgUrls: formatImageUrls(['DSCF1859.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -493,7 +612,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 14.903056,
     timeZone: 'Europe/Zagreb',
     imgUrls: formatImageUrls(['DSCF1999.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -504,7 +626,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 12.503368,
     timeZone: 'Europe/Rome',
     imgUrls: formatImageUrls(['DSCF2046.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -515,7 +640,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 11.906254,
     timeZone: 'Europe/Rome',
     imgUrls: formatImageUrls(['DSCF2056.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -526,7 +654,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 10.024872,
     timeZone: 'Europe/Rome',
     imgUrls: formatImageUrls(['DSCF2094.jpg', 'DSCF2095.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -537,7 +668,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 7.268391,
     timeZone: 'Europe/Paris',
     imgUrls: formatImageUrls(['DSCF2104.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -548,7 +682,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 2.177432,
     timeZone: 'Europe/Madrid',
     imgUrls: formatImageUrls(['DSCF2147.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -559,7 +696,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -2.582637,
     timeZone: 'Europe/Madrid',
     imgUrls: formatImageUrls(['DSCF2266.jpg', 'DSCF2270.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -570,7 +710,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -2.802835,
     timeZone: 'Europe/Madrid',
     imgUrls: formatImageUrls(['DSCF2314.jpg', 'DSCF2315.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -581,7 +724,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -4.421637,
     timeZone: 'Europe/Madrid',
     imgUrls: formatImageUrls(['DSCF2415.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -592,7 +738,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -5.604887,
     timeZone: 'Europe/Madrid',
     imgUrls: formatImageUrls(['DSCF2474.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -603,7 +752,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -5.505367,
     timeZone: 'Africa/Casablanca',
     imgUrls: formatImageUrls(['DSCF2492.jpg', 'DSCF2494.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -614,7 +766,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -5.633585,
     timeZone: 'Africa/Casablanca',
     imgUrls: formatImageUrls(['DSCF2510.jpg', 'DSCF2514.jpg', 'DSCF2518.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -625,7 +780,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -6.120795,
     timeZone: '',
     imgUrls: formatImageUrls(['DSCF2535.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -636,7 +794,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: -4.421637,
     timeZone: 'Europe/Madrid',
     imgUrls: formatImageUrls(['DSCF2566.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -647,7 +808,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 29.052495,
     timeZone: '',
     imgUrls: formatImageUrls(['DSCF2573.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -658,7 +822,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 29.722373,
     timeZone: 'Europe/Istanbul',
     imgUrls: formatImageUrls(['DSCF2594.jpg', 'DSCF2597.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -669,7 +836,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 30.781322,
     timeZone: 'Europe/Istanbul',
     imgUrls: formatImageUrls(['DSCF2645.jpg', 'DSCF2656.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -680,7 +850,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 32.522494,
     timeZone: 'Europe/Istanbul',
     imgUrls: formatImageUrls(['DSCF2697.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -691,7 +864,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 33.411018,
     timeZone: 'Europe/Istanbul',
     imgUrls: formatImageUrls(['DSCF2711.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -702,7 +878,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 34.829623,
     timeZone: 'Europe/Istanbul',
     imgUrls: formatImageUrls(['DSCF2727.jpg', 'DSCF2753.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
   {
@@ -713,7 +892,10 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
     lon: 29.052495,
     timeZone: 'Europe/Istanbul',
     imgUrls: formatImageUrls(['DSCF2755.jpg']),
-    story: faker.lorem.paragraphs(faker.random.number({ min: 1, max: 6 })),
+    story: faker.lorem.paragraphs(
+      faker.random.number({ min: 1, max: 6 }),
+      paragraphSeparator,
+    ),
     name: faker.lorem.sentence(),
   },
 ];

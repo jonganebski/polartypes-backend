@@ -68,7 +68,7 @@ export class CommentService {
         hasMorePages: 0 < count - take,
       };
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return { ok: false, error: 'Failed to load comments.' };
     }
   }
