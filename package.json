@@ -8,7 +8,7 @@
   "scripts": {
     "seed:dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/seed.ts",
     "seed:prod": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register src/seed.ts",
-    "prebuild": "rimraf dist",
+    "prebuild": "rimraf dist & npm run seed:prod",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env NODE_ENV=production nest start",
