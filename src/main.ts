@@ -9,9 +9,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin:
-      process.env.NODE_ENV === 'production'
-        ? 'https://polartypes.netlify.app'
-        : 'http://localhost:3000',
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : 'https://polartypes.netlify.app',
   });
   app.use('/static', expressStatic(process.cwd() + '/src/uploads'));
   await app.listen(process.env.PORT ?? DEFAULT_PORT);
