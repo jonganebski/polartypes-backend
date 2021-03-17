@@ -62,6 +62,7 @@ import { UsersModule } from './users/user.module';
       },
     }),
     TypeOrmModule.forRoot({
+      ssl: { rejectUnauthorized: false },
       type: 'postgres',
       ...(process.env.DATABASE_URL
         ? { url: process.env.DATABASE_URL }
