@@ -7,7 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "seed:dev": "NODE_ENV=development ts-node -r tsconfig-paths/register src/seed.ts",
-    "prebuild": "rimraf dist",
+    "seed:prod": "NODE_ENV=production ts-node -r tsconfig-paths/register src/seed.ts",
+    "prebuild": "rimraf dist & npm run seed:prod",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env NODE_ENV=production nest start",
