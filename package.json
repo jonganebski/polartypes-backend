@@ -34,6 +34,7 @@
     "aws-sdk": "^2.817.0",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
+    "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "faker": "^5.4.0",
     "graphql": "^15.5.0",

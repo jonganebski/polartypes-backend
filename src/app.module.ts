@@ -45,13 +45,6 @@ import { UsersModule } from './users/user.module';
       autoSchemaFile: true,
       installSubscriptionHandlers: true,
       playground: process.env.NODE_ENV !== 'production',
-      cors: {
-        origin:
-          process.env.NODE_ENV === 'development'
-            ? 'http://localhost:3000'
-            : 'https://polartypes.netlify.app',
-        credentials: true,
-      },
       context: ({ req, connection }) => {
         const TOKEN_KEY = 'x-jwt';
         if (req) {
