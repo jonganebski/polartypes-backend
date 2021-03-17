@@ -92,6 +92,9 @@ export class SeederService {
           lastName,
           username,
           slug,
+          about: faker.lorem.sentences(faker.random.number({ min: 0, max: 3 })),
+          timeZone: faker.address.timeZone(),
+          city: faker.address.city(),
           password: process.env.SEED_USER_PASSWORD,
         });
         const user = await this.userRepo.save(created);

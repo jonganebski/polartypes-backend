@@ -24,6 +24,17 @@ export class TripService {
     private readonly userService: UserService,
   ) {}
 
+  private getPermissions = async (authUser: Users, targetUserSlug: string) => {
+    const permissions = [Availability.Public];
+    if (authUser?.slug === targetUserSlug) {
+      permissions.push(Availability.Followers, Availability.Private);
+    }
+    if (await this.userService.isFollowing(targetUserSlug, authUser)) {
+      permissions.push(Availability.Followers);
+    }
+    return permissions;
+  };
+
   async createTrip(
     user: Users,
     createTripInput: CreateTripInput,
@@ -39,41 +50,33 @@ export class TripService {
   }
 
   async readTrips(
-    user: Users,
+    authUser: Users,
     { slug }: ReadTripsInput,
   ): Promise<ReadTripsOutput> {
     try {
-      const targetUser = await this.userRepo.findOne(
-        { slug },
-        {
-          relations: ['trips', 'trips.steps'],
-        },
-      );
+      const targetUser = await this.userRepo
+        .createQueryBuilder('user')
+        .where('user.slug = :slug', { slug })
+        .getOne();
+
       if (!targetUser) {
         return { ok: false, error: USER_ERR.UserNotFound };
       }
-      const isSelf = Boolean(user?.id === targetUser.id);
 
-      const isFollower = await this.userService.isFollower(targetUser, user);
+      const permissions = await this.getPermissions(authUser, slug);
 
-      // const isFollower = Boolean(
-      //   targetUser.followers?.some((follower) => follower.id === user?.id),
-      // );
-      if (isSelf) {
-        // Reading user's own trips. (private)
-        return { ok: true, targetUser };
-      }
-      if (isFollower) {
-        // Reading follower's trip. (followers)
-        targetUser.trips = targetUser.trips.filter(
-          (trip) => trip.availability !== Availability.Private,
-        );
-      } else {
-        // Reading somebody's trip. (public)
-        targetUser.trips = targetUser.trips.filter(
-          (trip) => trip.availability === Availability.Public,
-        );
-      }
+      const trips = await this.tripRepo
+        .createQueryBuilder('trip')
+        .leftJoin('trip.traveler', 'traveler')
+        .where('traveler.id = :id', { id: targetUser.id })
+        .andWhere('trip.availability IN (:...permissions)', {
+          permissions,
+        })
+        .leftJoinAndSelect('trip.steps', 'steps')
+        .getMany();
+
+      targetUser.trips = trips;
+
       return { ok: true, targetUser };
     } catch (err) {
       console.log(err);
@@ -82,7 +85,7 @@ export class TripService {
   }
 
   async readTrip(
-    user: Users,
+    authUser: Users,
     { tripId }: ReadTripInput,
   ): Promise<ReadTripOutput> {
     try {
@@ -90,32 +93,27 @@ export class TripService {
         where: { id: tripId },
         relations: ['steps', 'traveler'],
       });
-      if (!trip) {
-        return { ok: false, error: TRIP_ERR.TripNotFound };
-      }
+      if (!trip) return { ok: false, error: TRIP_ERR.TripNotFound };
+
       const targetUser = await this.userRepo.findOne(
         { id: trip.travelerId },
         { relations: ['followers'] },
       );
-      if (!targetUser) {
-        return { ok: false, error: USER_ERR.UserNotFound };
-      }
-      const isSelf = Boolean(user?.id === trip.travelerId);
-      const isPublicAllowed = Boolean(
-        trip.availability === Availability.Public,
-      );
-      const isFollowersAllowedAndIsFollower = Boolean(
-        targetUser.followers?.some((follower) => follower.id === user?.id) &&
-          trip.availability !== Availability.Private,
-      );
-      if (isSelf || isPublicAllowed || isFollowersAllowedAndIsFollower) {
-        if (!isSelf) {
-          this.tripRepo.increment({ id: tripId }, 'viewCount', 1);
-        }
-        return { ok: true, trip };
-      } else {
+      if (!targetUser) return { ok: false, error: USER_ERR.UserNotFound };
+
+      const permissions = await this.getPermissions(authUser, targetUser.slug);
+
+      if (!permissions.includes(trip.availability)) {
         return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
+
+      const isSelf = Boolean(authUser?.id === trip.travelerId);
+
+      if (!isSelf) {
+        await this.tripRepo.increment({ id: tripId }, 'viewCount', 1);
+      }
+
+      return { ok: true, trip };
     } catch (err) {
       console.log(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };

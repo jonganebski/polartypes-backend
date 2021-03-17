@@ -290,24 +290,24 @@ export class UserService {
       .getCount();
   }
 
-  async isFollowing(rootUser: Users, authUser: Users): Promise<boolean> {
-    if (authUser && rootUser.id !== authUser.id) {
+  async isFollowing(rootUserSlug: string, authUser: Users): Promise<boolean> {
+    if (authUser && rootUserSlug !== authUser.slug) {
       const count = await this.userRepo
         .createQueryBuilder('rootUser')
         .innerJoin('rootUser.followers', 'follower')
-        .where('rootUser.id = :id', { id: rootUser.id })
+        .where('rootUser.slug = :slug', { slug: rootUserSlug })
         .andWhere('follower.id = :authUserId', { authUserId: authUser.id })
         .getCount();
       return Boolean(count);
     }
     return false;
   }
-  async isFollower(rootUser: Users, authUser: Users): Promise<boolean> {
-    if (authUser && rootUser.id !== authUser.id) {
+  async isFollower(rootUserSlug: string, authUser: Users): Promise<boolean> {
+    if (authUser && rootUserSlug !== authUser.slug) {
       const count = await this.userRepo
         .createQueryBuilder('rootUser')
         .innerJoin('rootUser.followings', 'following')
-        .where('rootUser.id = :id', { id: rootUser.id })
+        .where('rootUser.slug = :slug', { slug: rootUserSlug })
         .andWhere('following.id = :authUserId', { authUserId: authUser.id })
         .getCount();
       return Boolean(count);

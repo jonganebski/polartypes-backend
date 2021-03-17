@@ -126,6 +126,7 @@ export class UserResolver {
   @Access('Signedin')
   @ResolveField(() => Boolean)
   isMe(@Root() rootUser: Users, @AuthUser() authUser: Users) {
+    if (!authUser) return false;
     return rootUser.id === authUser.id;
   }
 
@@ -135,7 +136,7 @@ export class UserResolver {
     @Root() rootUser: Users,
     @AuthUser() authUser: Users,
   ): Promise<boolean> {
-    return this.userService.isFollowing(rootUser, authUser);
+    return this.userService.isFollowing(rootUser.slug, authUser);
   }
 
   @Access('Signedin')
@@ -144,7 +145,7 @@ export class UserResolver {
     @Root() rootUser: Users,
     @AuthUser() authUser: Users,
   ): Promise<boolean> {
-    return this.userService.isFollower(rootUser, authUser);
+    return this.userService.isFollower(rootUser.slug, authUser);
   }
 
   // @Access('Signedin')

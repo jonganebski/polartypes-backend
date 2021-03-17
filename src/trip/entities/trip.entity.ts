@@ -51,7 +51,7 @@ export class Trip extends CoreEntity {
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   coverUrl?: string;
 
   @Field(() => Availability)

@@ -8,8 +8,8 @@ export const SEED_USERS_COUNT = 50;
 export const EXAMPLE_TRIP: CreateTripInput = {
   availability: Availability.Public,
   name: 'Bicycle trip',
-  startDate: '2018-05-03',
-  endDate: '2020-03-26',
+  startDate: '2018-05-03T09:00:00',
+  endDate: '2020-03-26T09:00:00',
   summary:
     "Example trip of Polartypes based on developer's bicycle trip from 2018 to 2020.",
 };
@@ -576,7 +576,7 @@ export const EXAMPLE_STEPS: Omit<CreateStepInput, 'tripId'>[] = [
   {
     country: 'Spain',
     location: 'Malaga',
-    arrivedAt: '2019-12-31:20:00:00',
+    arrivedAt: '2019-12-31T20:00:00',
     lat: 36.721303,
     lon: -4.421637,
     timeZone: 'Europe/Madrid',
