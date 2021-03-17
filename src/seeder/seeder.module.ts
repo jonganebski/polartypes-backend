@@ -54,7 +54,7 @@ import { SeederService } from './seeder.service';
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DATABASE,
           }),
-      synchronize: process.env.NODE_ENV !== 'prod',
+      synchronize: process.env.NODE_ENV !== 'production',
       logging:
         process.env.NODE_ENV !== 'production' &&
         process.env.NODE_ENV !== 'test',
