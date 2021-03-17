@@ -47,7 +47,7 @@ export class UserService {
       if (existUser) {
         return { ok: false, error: USER_ERR.EmailExists };
       }
-      let username = (firstName + lastName).replace(/[" "]/g, '');
+      let username = (firstName + lastName).replace(/[ ,'-]/g, '');
       let slug = username.toLowerCase();
       let number = 1;
       while (true) {
@@ -91,9 +91,10 @@ export class UserService {
         user.username !== otherInputs.username,
       );
       const isUpdatingPassword = Boolean(password && newPassword);
+
       if (isUpdatingUsername) {
         const user = await this.userRepo.findOne({
-          username: otherInputs.username,
+          slug: otherInputs.username.toLowerCase(),
         });
         if (user) {
           return { ok: false, error: USER_ERR.UsernameExists };

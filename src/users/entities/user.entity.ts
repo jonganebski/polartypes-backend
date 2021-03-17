@@ -1,7 +1,7 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import * as argon2 from 'argon2';
-import { IsEmail, IsString, IsUrl } from 'class-validator';
+import { IsEmail, IsString, IsUrl, Matches } from 'class-validator';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Like } from 'src/step/entities/like.entity';
@@ -69,11 +69,13 @@ export class Users extends CoreEntity {
   @Field(() => String)
   @Column()
   @IsString()
+  @Matches(/^[a-z]+$/i)
   firstName: string;
 
   @Field(() => String, { nullable: true })
   @Column()
   @IsString()
+  @Matches(/^[a-z]+$/i)
   lastName?: string;
 
   @Field(() => String, { nullable: true })

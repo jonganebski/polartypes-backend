@@ -13,12 +13,12 @@ export class CreateAccountInput extends PickType(Users, ['email']) {
 
   @Field(() => String)
   @IsString()
-  @Matches(/^[a-zA-Z0-9]*$/)
+  @Matches(/^[a-z ,'-]+$/i)
   firstName: string;
 
   @Field(() => String)
   @IsString()
-  @Matches(/^[a-zA-Z0-9]*$/)
+  @Matches(/^[a-z ,'-]+$/i)
   lastName: string;
 }
 
