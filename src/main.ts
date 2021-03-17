@@ -12,6 +12,7 @@ async function bootstrap() {
       process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
         : 'https://polartypes.netlify.app',
+    credentials: true,
   });
   app.use('/static', expressStatic(process.cwd() + '/src/uploads'));
   await app.listen(process.env.PORT ?? DEFAULT_PORT);
