@@ -33,6 +33,27 @@ $ npm install
 $ npm run start:dev
 ```
 
+## Seed data
+
+As I fully customized example trip and its steps, you have to modify `EXAMPLE_STEPS` at `src/seeder/seeder.constants.ts`. Just changing image filenames will do the job.  
+You need to put images at `src/uploads/example`.
+
+```
+// .env.dev
+
+SEED_USER_PASSWORD=
+
+SUPERUSER_EMAIL=
+SUPERUSER_FIRSTNAME=
+SUPERUSER_LASTNAME=
+SUPERUSER_TIMEZONE=
+SUPERUSER_PASSWORD=
+```
+
+```console
+$ npm run seed:dev
+```
+
 ---
 
 <p align="center">
