@@ -21,10 +21,6 @@ POSTGRES_PASSWORD=
 POSTGRES_DATABASE=
 
 JWT_PRIVATE_KEY=
-
-AWS_S3_ACCESS_KEY_ID=
-AWS_S3_SECRET_ACCESS_KEY=
-AWS_S3_BUCKET_NAME=
 ```
 
 ```console
@@ -52,6 +48,18 @@ SUPERUSER_PASSWORD=
 
 ```console
 $ npm run seed:dev
+```
+
+## Aws S3 strorage
+
+Images will be saved at `src/uploads` under development environment. But if you want to test aws uploads, you need to add these environment variables and manipulate FileInterceptor at `src/aws-s3/aws-s3.controller.ts`, and deleteImage function at `src/aws-s3/aws-s3.service.ts`
+
+```
+// .env.dev
+
+AWS_S3_ACCESS_KEY_ID=
+AWS_S3_SECRET_ACCESS_KEY=
+AWS_S3_BUCKET_NAME=
 ```
 
 ---

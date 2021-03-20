@@ -36,9 +36,11 @@ import { UsersModule } from './users/user.module';
         POSTGRES_PASSWORD: Joi.string(),
         POSTGRES_DATABASE: Joi.string(),
         JWT_PRIVATE_KEY: Joi.string().required(),
-        AWS_S3_ACCESS_KEY_ID: Joi.string().required(),
-        AWS_S3_SECRET_ACCESS_KEY: Joi.string().required(),
-        AWS_S3_BUCKET_NAME: Joi.string().required(),
+        ...(process.env.NODE_ENV === 'production' && {
+          AWS_S3_ACCESS_KEY_ID: Joi.string().required(),
+          AWS_S3_SECRET_ACCESS_KEY: Joi.string().required(),
+          AWS_S3_BUCKET_NAME: Joi.string().required(),
+        }),
       }),
     }),
     GraphQLModule.forRoot({
