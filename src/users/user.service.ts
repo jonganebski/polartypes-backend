@@ -88,7 +88,7 @@ export class UserService {
         { select: ['password'] },
       );
       const isUpdatingUsername = Boolean(
-        user.username !== otherInputs.username,
+        otherInputs.username && user.username !== otherInputs.username,
       );
       const isUpdatingPassword = Boolean(password && newPassword);
 
@@ -167,7 +167,7 @@ export class UserService {
       await this.userRepo.save([
         { slug, ...targetUser, followers: targetUser.followers },
       ]);
-      return { ok: true, slug };
+      return { ok: true, id: targetUser.id };
     } catch (err) {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
@@ -192,7 +192,7 @@ export class UserService {
       await this.userRepo.save([
         { slug, ...targetUser, followers: targetUser.followers },
       ]);
-      return { ok: true, slug };
+      return { ok: true, id: targetUser.id };
     } catch {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
