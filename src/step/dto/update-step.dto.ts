@@ -11,4 +11,7 @@ export class UpdateStepInput extends PartialType(Step) {
 }
 
 @ObjectType()
-export class UpdateStepOutput extends CoreOutput {}
+export class UpdateStepOutput extends CoreOutput {
+  @Field(() => [String], { nullable: true })
+  imgUrls?: string[];
+}

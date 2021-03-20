@@ -52,10 +52,11 @@ export class StepService {
       if (step.travelerId !== user.id) {
         return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
-      await this.stepRepo.save([
-        { id: updateStepInput.stepId, ...updateStepInput },
-      ]);
-      return { ok: true };
+      const updated = await this.stepRepo.save({
+        id: updateStepInput.stepId,
+        ...updateStepInput,
+      });
+      return { ok: true, imgUrls: updated.imgUrls };
     } catch {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
