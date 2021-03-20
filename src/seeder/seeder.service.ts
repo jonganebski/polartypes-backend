@@ -41,7 +41,7 @@ export class SeederService {
       await this.seedComments();
       console.log('🌱 Seeding done! 🌱');
     } catch (err) {
-      console.error('❌ Seeding aborted. Error: ', err);
+      console.error('❌ Seeding aborted.', err);
     }
   }
 
@@ -55,10 +55,7 @@ export class SeederService {
 
       const existSuperuser = await this.userRepo.findOne({ where: { slug } });
       if (existSuperuser) {
-        this.superuser = existSuperuser;
-        this.users.push(existSuperuser);
-        console.log('🤖 Superuser already exists. Continue seeding...');
-        return;
+        throw new Error('🤖 Superuser already exists. Abort seeding...');
       }
 
       const created = await this.userRepo.create({
