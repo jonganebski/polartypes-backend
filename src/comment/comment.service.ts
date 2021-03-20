@@ -44,8 +44,8 @@ export class CommentService {
   }
 
   async listComments({
-    cursorId,
     stepId,
+    cursorDate,
   }: ListCommentsInput): Promise<ListCommentsOutput> {
     try {
       const take = 10;
@@ -53,8 +53,8 @@ export class CommentService {
         .createQueryBuilder('comment')
         .leftJoin('comment.step', 'step')
         .where('step.id = :id', { id: stepId })
-        .andWhere('comment.id < :cursorId', {
-          cursorId: cursorId ?? Math.pow(2, 31) - 1,
+        .andWhere('comment.createdAt < :cursorDate', {
+          cursorDate: cursorDate ?? new Date(),
         })
         .leftJoinAndSelect('comment.creator', 'creator')
         .orderBy('comment.createdAt', 'DESC')
@@ -64,8 +64,8 @@ export class CommentService {
       return {
         ok: true,
         step: { id: stepId, comments },
-        endCursorId: comments[comments.length - 1]?.id ?? null,
-        hasMorePages: 0 < count - take,
+        endCursorDate: comments[comments.length - 1]?.createdAt ?? null,
+        hasNextPage: 0 < count - take,
       };
     } catch (err) {
       console.error(err);
