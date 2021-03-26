@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { STEP_ERR } from 'src/common/common.constants';
+import { COMMON_ERR } from 'src/errors/common.errors';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -8,6 +8,7 @@ import { CreateStepInput } from './dto/create-step.dto';
 import { Like } from './entities/like.entity';
 import { Step } from './entities/step.entity';
 import { LikeService, StepService } from './step.service';
+import { Comment } from 'src/comment/entities/comment.entity';
 
 const mockStepRepository = () => {
   return {
@@ -20,6 +21,10 @@ const mockStepRepository = () => {
 
 const mockTripRepository = () => {
   return { findOne: jest.fn() };
+};
+
+const mockCommentRespository = () => {
+  return { createQueryBuilder: jest.fn() };
 };
 
 const mockLikeRepository = () => {
@@ -42,6 +47,11 @@ describe('stepService', () => {
         StepService,
         { provide: getRepositoryToken(Step), useValue: mockStepRepository() },
         { provide: getRepositoryToken(Trip), useValue: mockTripRepository() },
+        { provide: getRepositoryToken(Like), useValue: mockLikeRepository() },
+        {
+          provide: getRepositoryToken(Comment),
+          useValue: mockCommentRespository(),
+        },
       ],
     }).compile();
     service = module.get<StepService>(StepService);
@@ -76,7 +86,10 @@ describe('stepService', () => {
     it('should fail on exception', async () => {
       tripRepo.findOne.mockRejectedValue(mockTrip);
       const result = await service.createStep(mockUser, mockInput);
-      expect(result).toEqual({ ok: false, error: STEP_ERR.createStepfailed });
+      expect(result).toEqual({
+        ok: false,
+        error: COMMON_ERR.InternalServerErr,
+      });
     });
   });
 
@@ -94,6 +107,7 @@ describe('likeService', () => {
       providers: [
         LikeService,
         { provide: getRepositoryToken(Like), useValue: mockLikeRepository },
+        { provide: getRepositoryToken(Step), useValue: mockStepRepository },
       ],
     }).compile();
     service = module.get<LikeService>(LikeService);

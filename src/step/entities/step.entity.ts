@@ -1,16 +1,30 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsArray, IsISO8601, IsNumber, IsString, IsUrl } from 'class-validator';
+import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { Users } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
+import {
+  BeforeRemove,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  RelationId,
+} from 'typeorm';
 import { Like } from './like.entity';
 
 @InputType('StepInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class Step extends CoreEntity {
+  @BeforeRemove()
+  async removeImages() {
+    const awsS3Service = new AwsS3Service();
+    await awsS3Service.deleteImage({ urls: this.imgUrls });
+  }
+
   @Field(() => String)
   @Column()
   location: string;

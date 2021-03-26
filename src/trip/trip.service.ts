@@ -89,10 +89,14 @@ export class TripService {
     { tripId }: ReadTripInput,
   ): Promise<ReadTripOutput> {
     try {
-      const trip = await this.tripRepo.findOne({
-        where: { id: tripId },
-        relations: ['steps', 'traveler'],
-      });
+      const trip = await this.tripRepo
+        .createQueryBuilder('trip')
+        .where('trip.id = :tripId', { tripId })
+        .leftJoinAndSelect('trip.traveler', 'traveler')
+        .leftJoinAndSelect('trip.steps', 'step')
+        .orderBy('step.arrivedAt')
+        .getOne();
+
       if (!trip) return { ok: false, error: TRIP_ERR.TripNotFound };
 
       const targetUser = await this.userRepo.findOne(

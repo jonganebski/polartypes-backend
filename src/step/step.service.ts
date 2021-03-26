@@ -74,9 +74,10 @@ export class StepService {
       if (step.travelerId !== user.id) {
         return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
-      await this.stepRepo.delete({ id: stepId });
+      await this.stepRepo.remove([step]);
       return { ok: true, stepId };
-    } catch {
+    } catch (err) {
+      console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
