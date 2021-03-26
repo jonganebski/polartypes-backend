@@ -4,7 +4,7 @@ import { User } from 'aws-sdk/clients/appstream';
 import { COMMON_ERR } from 'src/errors/common.errors';
 import { USER_ERR } from 'src/errors/user.errors';
 import { JwtService } from 'src/jwt/jwt.service';
-import { DeleteResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateAccountOutput } from './dto/create-account.dto';
 import {
   DeleteAccountInput,
@@ -20,7 +20,6 @@ import {
   ListFollowingsOutput,
 } from './dto/list-followings.dto';
 import { UnfollowOutput } from './dto/unfollow.dto';
-import { UpdateAccountOutput } from './dto/update-account.dto';
 import { Users } from './entities/user.entity';
 import { UserService } from './user.service';
 
