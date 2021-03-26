@@ -93,10 +93,10 @@ export class UserService {
       const isUpdatingPassword = Boolean(password && newPassword);
 
       if (isUpdatingUsername) {
-        const user = await this.userRepo.findOne({
-          slug: otherInputs.username.toLowerCase(),
+        const existUserCount = await this.userRepo.count({
+          where: { slug: otherInputs.username.toLowerCase() },
         });
-        if (user) {
+        if (existUserCount) {
           return { ok: false, error: USER_ERR.UsernameExists };
         }
       }
@@ -202,7 +202,7 @@ export class UserService {
     user: Users,
     { password }: DeleteAccountInput,
   ): Promise<DeleteAccountoutput> {
-    const isMatch = user.verifyPassword(password);
+    const isMatch = await user.verifyPassword(password);
     try {
       if (!isMatch) return { ok: false, error: COMMON_ERR.NotAuthorized };
 
@@ -283,7 +283,7 @@ export class UserService {
       .getCount();
   }
 
-  async countFollwers(user: Users): Promise<number> {
+  async countFollowers(user: Users): Promise<number> {
     return this.userRepo
       .createQueryBuilder('user')
       .leftJoin('user.followings', 'following')

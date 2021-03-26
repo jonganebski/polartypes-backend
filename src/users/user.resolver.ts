@@ -125,7 +125,7 @@ export class UserResolver {
 
   @ResolveField(() => Int)
   async countFollowers(@Root() user: Users): Promise<number> {
-    return this.userService.countFollwers(user);
+    return this.userService.countFollowers(user);
   }
 
   @Access('Signedin')
