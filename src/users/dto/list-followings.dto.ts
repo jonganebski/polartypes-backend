@@ -18,7 +18,7 @@ export class ListFollowingsInput {
 @ObjectType()
 export class ListFollowingsOutput extends CoreOutput {
   @Field(() => Users, { nullable: true })
-  user?: Pick<Users, 'slug' | 'followings'>;
+  user?: Pick<Users, 'id' | 'slug' | 'followings'>;
 
   @Field(() => Int, { nullable: true })
   endCursorId?: number;

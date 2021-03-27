@@ -219,6 +219,11 @@ export class UserService {
     cursorId,
   }: ListFollowingsInput): Promise<ListFollowingsOutput> {
     try {
+      const { id } = await this.userRepo.findOne({
+        where: { slug },
+        select: ['id'],
+      });
+
       const take = 10;
       const [followings, count] = await this.userRepo
         .createQueryBuilder('user')
@@ -233,7 +238,7 @@ export class UserService {
 
       return {
         ok: true,
-        user: { slug, followings },
+        user: { id, slug, followings },
         endCursorId: followings[followings.length - 1]?.id ?? null,
         hasNextPage: 0 < count - take,
       };
@@ -248,6 +253,11 @@ export class UserService {
     cursorId,
   }: ListFollowersInput): Promise<ListFollowersOutput> {
     try {
+      const { id } = await this.userRepo.findOne({
+        where: { slug },
+        select: ['id'],
+      });
+
       const take = 10;
       const [followers, count] = await this.userRepo
         .createQueryBuilder('user')
@@ -263,6 +273,7 @@ export class UserService {
       return {
         ok: true,
         user: {
+          id,
           slug,
           followers,
         },
@@ -291,6 +302,7 @@ export class UserService {
       .getCount();
   }
 
+  // Is auth user following root user? / Is auth user follower of root user?
   async isFollowing(rootUserSlug: string, authUser: Users): Promise<boolean> {
     if (authUser && rootUserSlug !== authUser.slug) {
       const count = await this.userRepo
@@ -303,6 +315,8 @@ export class UserService {
     }
     return false;
   }
+
+  //
   async isFollower(rootUserSlug: string, authUser: Users): Promise<boolean> {
     if (authUser && rootUserSlug !== authUser.slug) {
       const count = await this.userRepo

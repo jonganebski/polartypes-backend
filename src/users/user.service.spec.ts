@@ -430,17 +430,23 @@ describe('UserService', () => {
 
   describe('listFollowings', () => {
     const mockFollowing = new Users();
+    mockFollowing.id = 999;
     const input: ListFollowingsInput = {
       slug: 'targetUserSlug',
     };
     it('should return followings when cursorId is not provided', async () => {
-      mockFollowing.id = 999;
       const mockResult = [[mockFollowing], 20];
+      userRepository.findOne.mockResolvedValue({ id: mockFollowing.id });
       getManyAndCountSpy.mockResolvedValue(mockResult);
       const result = await service.listFollowings(input);
+      expect(userRepository.findOne).toHaveBeenCalledTimes(1);
       expect(result).toEqual<ListFollowingsOutput>({
         ok: true,
-        user: { slug: input.slug, followings: [mockFollowing] },
+        user: {
+          id: mockFollowing.id,
+          slug: input.slug,
+          followings: [mockFollowing],
+        },
         endCursorId: 999,
         hasNextPage: true,
       });
@@ -449,11 +455,12 @@ describe('UserService', () => {
     it('should return followings with cursorId id provided', async () => {
       const mockResult = [[], 20];
       input.cursorId = 0;
+      userRepository.findOne.mockResolvedValue({ id: mockFollowing.id });
       getManyAndCountSpy.mockResolvedValue(mockResult);
       const result = await service.listFollowings(input);
       expect(result).toEqual<ListFollowingsOutput>({
         ok: true,
-        user: { slug: input.slug, followings: [] },
+        user: { id: mockFollowing.id, slug: input.slug, followings: [] },
         endCursorId: null,
         hasNextPage: true,
       });
@@ -471,18 +478,23 @@ describe('UserService', () => {
 
   describe('listFollowers', () => {
     const mockFollower = new Users();
+    mockFollower.id = 1;
     const input: ListFollowersInput = { slug: 'targetUserslug' };
 
     it('should return followers when cursorId is not provided', async () => {
-      const mockFollowerId = 10;
-      mockFollower.id = mockFollowerId;
       const mockResult = [[mockFollower], 20];
+      userRepository.findOne.mockResolvedValue({ id: mockFollower.id });
       getManyAndCountSpy.mockResolvedValue(mockResult);
       const result = await service.listFollowers(input);
+      expect(userRepository.findOne).toHaveBeenCalledTimes(1);
       expect(result).toEqual<ListFollowersOutput>({
         ok: true,
-        user: { slug: input.slug, followers: [mockFollower] },
-        endCursorId: mockFollowerId,
+        user: {
+          id: mockFollower.id,
+          slug: input.slug,
+          followers: [mockFollower],
+        },
+        endCursorId: mockFollower.id,
         hasNextPage: true,
       });
     });
@@ -490,11 +502,12 @@ describe('UserService', () => {
     it('should return followers when cursorId provided', async () => {
       input.cursorId = 999;
       const mockResult = [[], 20];
+      userRepository.findOne.mockResolvedValue({ id: mockFollower.id });
       getManyAndCountSpy.mockResolvedValue(mockResult);
       const result = await service.listFollowers(input);
       expect(result).toEqual<ListFollowersOutput>({
         ok: true,
-        user: { slug: input.slug, followers: [] },
+        user: { id: mockFollower.id, slug: input.slug, followers: [] },
         endCursorId: null,
         hasNextPage: true,
       });
