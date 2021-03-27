@@ -8,16 +8,19 @@ import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { UserService } from 'src/users/user.service';
 import * as typeorm from 'typeorm';
+import { ReadTripInput, ReadTripOutput } from './dto/read-trip.dto';
+import { ReadTripsInput } from './dto/read-trips.dto';
 import { Availability, Trip } from './entities/trip.entity';
 import { TripService } from './trip.service';
+import { FindOperator } from 'typeorm';
 
 const whereSpy = jest.fn().mockReturnThis();
 const leftJoinSpy = jest.fn().mockReturnThis();
 const andWhereSpy = jest.fn().mockReturnThis();
 const leftJoinAndSelectSpy = jest.fn().mockReturnThis();
 const orderBySpy = jest.fn().mockReturnThis();
-const getManySpy = jest.fn().mockReturnThis();
-const getOneSpy = jest.fn().mockReturnThis();
+const getManySpy = jest.fn();
+const getOneSpy = jest.fn();
 
 const mockTripRepo = () => {
   return {
@@ -27,7 +30,7 @@ const mockTripRepo = () => {
     increment: jest.fn(),
     delete: jest.fn(),
     findAndCount: jest.fn(),
-    createQueryBuilder: jest.fn().mockReturnValue(() => ({
+    createQueryBuilder: jest.fn().mockReturnValue({
       where: whereSpy,
       leftJoin: leftJoinSpy,
       andWhere: andWhereSpy,
@@ -35,12 +38,19 @@ const mockTripRepo = () => {
       orderBy: orderBySpy,
       getMany: getManySpy,
       getOne: getOneSpy,
-    })),
+    }),
   };
 };
 
 const mockUserRepo = () => {
-  return { findOne: jest.fn(), findAndCount: jest.fn() };
+  return {
+    findOne: jest.fn(),
+    findAndCount: jest.fn(),
+    createQueryBuilder: jest.fn().mockReturnValue({
+      where: whereSpy,
+      getOne: getOneSpy,
+    }),
+  };
 };
 
 const mockAwsS3Service = () => {
@@ -49,8 +59,9 @@ const mockAwsS3Service = () => {
   };
 };
 
+const isFollowingSpy = jest.fn();
 const mockUserService = () => {
-  return { isFollowing: jest.fn() };
+  return { isFollowing: isFollowingSpy };
 };
 
 describe('tripService', () => {
@@ -76,6 +87,44 @@ describe('tripService', () => {
   });
 
   it.todo('should be defined');
+
+  describe('getPermissions', () => {
+    const mockAuthUser = new Users();
+    const mockTargetUserSlug = 'mockingSlug';
+
+    it('should return PUBLIC, FOLLOWERS, PRIVATE permissions', async () => {
+      mockAuthUser.slug = mockTargetUserSlug;
+      isFollowingSpy.mockResolvedValue(true);
+      const result = await service.getPermissions(
+        mockAuthUser,
+        mockTargetUserSlug,
+      );
+      expect(result).toEqual([
+        Availability.Private,
+        Availability.Followers,
+        Availability.Public,
+      ]);
+    });
+
+    it('should return PUBLIC permission', async () => {
+      isFollowingSpy.mockResolvedValue(false);
+      const result = await service.getPermissions(
+        undefined,
+        mockTargetUserSlug,
+      );
+      expect(result).toEqual([Availability.Public]);
+    });
+
+    it('should return PUBLIC, FOLLOWERS permissions', async () => {
+      mockAuthUser.slug = 'different';
+      isFollowingSpy.mockResolvedValue(true);
+      const result = await service.getPermissions(
+        mockAuthUser,
+        mockTargetUserSlug,
+      );
+      expect(result).toEqual([Availability.Public, Availability.Followers]);
+    });
+  });
 
   describe('createTrip', () => {
     const mockUser = new Users();
@@ -109,176 +158,111 @@ describe('tripService', () => {
     });
   });
 
-  // describe('readTrips', () => {
-  //   const mockUser = new Users();
-  //   const mockTargetUser = new Users();
-  //   const mockTrip = new Trip();
-  //   const mockInput = { targetUsername: 'mockingbird' };
-  //   it('should fail if targetUser is not found', async () => {
-  //     userRepo.findOne.mockResolvedValue(undefined);
-  //     const result = await service.readTrips(mockUser, mockInput);
-  //     expect(userRepo.findOne).toHaveBeenCalledTimes(1);
-  //     expect(userRepo.findOne).toHaveBeenCalledWith(
-  //       {
-  //         slug: mockInput.targetUsername.toLocaleLowerCase(),
-  //       },
-  //       {
-  //         relations: [
-  //           'trips',
-  //           'trips.steps',
-  //           'trips.steps.likes',
-  //           'trips.steps.likes.user',
-  //           'followers',
-  //           'followings',
-  //         ],
-  //       },
-  //     );
-  //     expect(result).toEqual({ ok: false, error: USER_ERR.UserNotFound });
-  //   });
+  describe('readTrips', () => {
+    const mockAuthUser = new Users();
+    const mockTrip = new Trip();
+    const mockInput = new ReadTripsInput();
 
-  //   it('should return targetUser with all trips if user is targetUser', async () => {
-  //     mockUser.id = 1;
-  //     mockTargetUser.id = 1;
-  //     userRepo.findOne.mockResolvedValue(mockTargetUser);
-  //     const result = await service.readTrips(mockUser, mockInput);
-  //     expect(result).toEqual({ ok: true, targetUser: mockTargetUser });
-  //   });
+    it('should fail if targetUser is not found', async () => {
+      getOneSpy.mockResolvedValue(undefined);
+      const result = await service.readTrips(mockAuthUser, mockInput);
+      expect(result).toEqual({ ok: false, error: USER_ERR.UserNotFound });
+    });
 
-  //   it("should return targetUser with followers allowed trips if user is targetUser's follower", async () => {
-  //     mockUser.id = 1;
-  //     mockTargetUser.id = 999;
-  //     mockTrip.availability = Availability.Followers;
-  //     mockTargetUser.followers = [mockUser];
-  //     mockTargetUser.trips = [mockTrip];
-  //     userRepo.findOne.mockResolvedValue(mockTargetUser);
-  //     const result = await service.readTrips(mockUser, mockInput);
-  //     expect(result).toEqual({ ok: true, targetUser: mockTargetUser });
-  //   });
+    it('should return targetUser', async () => {
+      getOneSpy.mockResolvedValue(mockAuthUser);
+      isFollowingSpy.mockResolvedValue([Availability.Private]);
+      getManySpy.mockResolvedValue([mockTrip]);
+      const result = await service.readTrips(mockAuthUser, mockInput);
+      expect(result).toEqual({
+        ok: true,
+        targetUser: { ...mockAuthUser, trips: [mockTrip] },
+      });
+    });
 
-  //   it('should return targetUser with public trips', async () => {
-  //     mockUser.id = 1;
-  //     mockTargetUser.id = 999;
-  //     mockTrip.availability = Availability.Public;
-  //     mockTargetUser.followers = [];
-  //     mockTargetUser.trips = [mockTrip];
-  //     userRepo.findOne.mockResolvedValue(mockTargetUser);
-  //     const result = await service.readTrips(mockUser, mockInput);
-  //     expect(result).toEqual({ ok: true, targetUser: mockTargetUser });
-  //   });
+    it('should fail on exception', async () => {
+      getOneSpy.mockRejectedValue(new Error());
+      const result = await service.readTrips(mockAuthUser, mockInput);
+      expect(result).toEqual({
+        ok: false,
+        error: COMMON_ERR.InternalServerErr,
+      });
+    });
+  });
 
-  //   it('should fail on exception', async () => {
-  //     userRepo.findOne.mockRejectedValue(new Error());
-  //     const result = await service.readTrips(mockUser, mockInput);
-  //     expect(result).toEqual({
-  //       ok: false,
-  //       error: COMMON_ERR.InternalServerErr,
-  //     });
-  //   });
-  // });
+  describe('readTrip', () => {
+    const mockAuthUser = new Users();
+    const mockTargetUser = new Users();
+    const mockTrip = new Trip();
+    const mockInput = new ReadTripInput();
 
-  // describe('readTrip', () => {
-  //   const mockUser = new Users();
-  //   const mockTargetUser = new Users();
-  //   const mockTrip = new Trip();
-  //   const mockInput = { tripId: 1 };
+    it('should fail if trip not found', async () => {
+      getOneSpy.mockResolvedValue(undefined);
+      const result = await service.readTrip(mockAuthUser, mockInput);
+      expect(result).toEqual<ReadTripOutput>({
+        ok: false,
+        error: TRIP_ERR.TripNotFound,
+      });
+    });
 
-  //   it('should fail if trip not found', async () => {
-  //     tripRepo.findOne.mockResolvedValue(undefined);
-  //     const result = await service.readTrip(mockUser, mockInput);
-  //     expect(tripRepo.findOne).toHaveBeenCalledTimes(1);
-  //     expect(tripRepo.findOne).toHaveBeenCalledWith(
-  //       {
-  //         id: mockInput.tripId,
-  //       },
-  //       {
-  //         relations: [
-  //           'steps',
-  //           'steps.traveler',
-  //           'steps.likes',
-  //           'steps.likes.user',
-  //           'steps.comments',
-  //           'steps.comments.creator',
-  //           'traveler',
-  //           'traveler.followers',
-  //           'traveler.followings',
-  //         ],
-  //       },
-  //     );
-  //     expect(result).toEqual({ ok: false, error: TRIP_ERR.TripNotFound });
-  //   });
+    it('should fail if targetUser is not found', async () => {
+      getOneSpy.mockResolvedValue(mockTrip);
+      userRepo.findOne.mockResolvedValue(undefined);
+      const result = await service.readTrip(mockAuthUser, mockInput);
+      expect(userRepo.findOne).toHaveBeenCalledTimes(1);
+      expect(userRepo.findOne).toHaveBeenCalledWith(
+        { id: mockTrip.travelerId },
+        { relations: ['followers'] },
+      );
+      expect(result).toEqual<ReadTripOutput>({
+        ok: false,
+        error: USER_ERR.UserNotFound,
+      });
+    });
 
-  //   it('should fail if targetUser is not found', async () => {
-  //     tripRepo.findOne.mockResolvedValue(mockTrip);
-  //     userRepo.findOne.mockResolvedValue(undefined);
-  //     const result = await service.readTrip(mockUser, mockInput);
-  //     expect(userRepo.findOne).toHaveBeenCalledTimes(1);
-  //     expect(userRepo.findOne).toHaveBeenCalledWith(
-  //       { id: mockTrip.travelerId },
-  //       { relations: ['followers'] },
-  //     );
-  //     expect(result).toEqual({ ok: false, error: USER_ERR.UserNotFound });
-  //   });
+    it('should fail when user is not authorized', async () => {
+      mockAuthUser.slug = 'authUser';
+      mockTargetUser.slug = 'notAuthorized';
+      mockTrip.availability = Availability.Private;
+      getOneSpy.mockResolvedValue(mockTrip);
+      userRepo.findOne.mockResolvedValue(mockTargetUser);
+      const result = await service.readTrip(mockAuthUser, mockInput);
+      expect(result).toEqual<ReadTripOutput>({
+        ok: false,
+        error: COMMON_ERR.NotAuthorized,
+      });
+    });
 
-  //   it('should fail when user is not authorized', async () => {
-  //     mockUser.id = 1;
-  //     mockTrip.travelerId = 999;
-  //     mockTrip.availability = Availability.Private;
-  //     tripRepo.findOne.mockResolvedValue(mockTrip);
-  //     userRepo.findOne.mockResolvedValue(mockUser);
-  //     const result = await service.readTrip(mockUser, mockInput);
-  //     expect(result).toEqual({ ok: false, error: COMMON_ERR.NotAuthorized });
-  //   });
+    it('should increase view count and return', async () => {
+      mockTrip.travelerId = 999;
+      getOneSpy.mockResolvedValue(mockTrip);
+      userRepo.findOne.mockResolvedValue(mockTargetUser);
+      mockTrip.availability = Availability.Public;
+      const result = await service.readTrip(undefined, mockInput);
+      expect(tripRepo.increment).toHaveBeenCalledTimes(1);
+      expect(result).toEqual<ReadTripOutput>({ ok: true, trip: mockTrip });
+    });
 
-  //   it('should return trip when targetUser is user', async () => {
-  //     mockUser.id = 1;
-  //     mockTrip.travelerId = 1;
-  //     tripRepo.findOne.mockResolvedValue(mockTrip);
-  //     userRepo.findOne.mockResolvedValue(mockTargetUser);
-  //     const result = await service.readTrip(mockUser, mockInput);
-  //     expect(result).toEqual({ ok: true, trip: mockTrip });
-  //   });
+    it('should not increase view count and return', async () => {
+      mockAuthUser.id = 1;
+      mockTrip.travelerId = 1;
+      getOneSpy.mockResolvedValue(mockTrip);
+      userRepo.findOne.mockResolvedValue(mockTargetUser);
+      mockTrip.availability = Availability.Public;
+      const result = await service.readTrip(mockAuthUser, mockInput);
+      expect(tripRepo.increment).toHaveBeenCalledTimes(0);
+      expect(result).toEqual<ReadTripOutput>({ ok: true, trip: mockTrip });
+    });
 
-  //   it('should return trip when availability is follower and user is follower', async () => {
-  //     mockUser.id = 1;
-  //     mockTargetUser.followers = [mockUser];
-  //     mockTrip.id = 1;
-  //     mockTrip.travelerId = 999;
-  //     mockTrip.availability = Availability.Followers;
-  //     tripRepo.findOne.mockResolvedValue(mockTrip);
-  //     userRepo.findOne.mockResolvedValue(mockTargetUser);
-  //     const result = await service.readTrip(mockUser, mockInput);
-  //     expect(tripRepo.increment).toHaveBeenCalledTimes(1);
-  //     expect(tripRepo.increment).toHaveBeenCalledWith(
-  //       { id: mockTrip.id },
-  //       'viewCount',
-  //       1,
-  //     );
-  //     expect(result).toEqual({ ok: true, trip: mockTrip });
-  //   });
-
-  //   it('should return trip if availability is public', async () => {
-  //     mockTrip.availability = Availability.Public;
-  //     tripRepo.findOne.mockResolvedValue(mockTrip);
-  //     userRepo.findOne.mockResolvedValue(mockTargetUser);
-  //     const result = await service.readTrip(mockUser, mockInput);
-  //     expect(tripRepo.increment).toHaveBeenCalledTimes(1);
-  //     expect(tripRepo.increment).toHaveBeenCalledWith(
-  //       { id: mockTrip.id },
-  //       'viewCount',
-  //       1,
-  //     );
-  //     expect(result).toEqual({ ok: true, trip: mockTrip });
-  //   });
-
-  //   it('should fail on exception', async () => {
-  //     tripRepo.findOne.mockRejectedValue(new Error());
-  //     const result = await service.readTrip(mockUser, mockInput);
-  //     expect(result).toEqual({
-  //       ok: false,
-  //       error: COMMON_ERR.InternalServerErr,
-  //     });
-  //   });
-  // });
+    it('should fail on exception', async () => {
+      getOneSpy.mockRejectedValue(new Error());
+      const result = await service.readTrip(mockAuthUser, mockInput);
+      expect(result).toEqual<ReadTripOutput>({
+        ok: false,
+        error: COMMON_ERR.InternalServerErr,
+      });
+    });
+  });
 
   describe('updateTrip', () => {
     const mockUser = new Users();
@@ -362,6 +346,16 @@ describe('tripService', () => {
       expect(result).toEqual({ ok: true });
     });
 
+    it('should fail on affected !== 1', async () => {
+      tripRepo.findOne.mockResolvedValue(mockTrip);
+      tripRepo.delete.mockResolvedValue({ affected: 999 });
+      const result = await service.deleteTrip(mockUser, mockInput);
+      expect(result).toEqual({
+        ok: false,
+        error: COMMON_ERR.InternalServerErr,
+      });
+    });
+
     it('should fail on exception', async () => {
       tripRepo.findOne.mockRejectedValue(new Error());
       const result = await service.deleteTrip(mockUser, mockInput);
@@ -374,12 +368,16 @@ describe('tripService', () => {
 
   describe('search', () => {
     const mockSearchTerm = 'mockingcow';
-    const mockUsers = [{ id: 1 }];
+    const mockUsers = [new Users()];
     const mockUsersCount = 1;
-    const mockTrips = [{ id: 1 }];
+    const mockTrips = [new Trip()];
     const mockTripsCount = 1;
     it('should return search result', async () => {
       const rawSpy = jest.spyOn(typeorm, 'Raw');
+      rawSpy.mockImplementation((x) => {
+        x('columnAlias');
+        return new FindOperator<any>('any', '');
+      });
       userRepo.findAndCount.mockResolvedValue([mockUsers, mockUsersCount]);
       tripRepo.findAndCount.mockResolvedValue([mockTrips, mockTripsCount]);
       const result = await service.search({ searchTerm: mockSearchTerm });

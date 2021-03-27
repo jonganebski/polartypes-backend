@@ -24,11 +24,15 @@ export class TripService {
     private readonly userService: UserService,
   ) {}
 
-  private getPermissions = async (authUser: Users, targetUserSlug: string) => {
-    const permissions = [Availability.Public];
+  getPermissions = async (authUser: Users, targetUserSlug: string) => {
     if (authUser?.slug === targetUserSlug) {
-      permissions.push(Availability.Followers, Availability.Private);
+      return [
+        Availability.Private,
+        Availability.Followers,
+        Availability.Public,
+      ];
     }
+    const permissions = [Availability.Public];
     if (await this.userService.isFollowing(targetUserSlug, authUser)) {
       permissions.push(Availability.Followers);
     }
@@ -167,9 +171,10 @@ export class TripService {
         urls: imagesToDelete,
       });
       const { affected } = await this.tripRepo.delete({ id: tripId });
-      if (affected === 1) {
-        return { ok: true };
+      if (affected !== 1) {
+        throw new Error();
       }
+      return { ok: true };
     } catch (err) {
       console.error(err);
       return { ok: false, error: COMMON_ERR.InternalServerErr };
@@ -178,27 +183,27 @@ export class TripService {
 
   async search({ searchTerm }: SearchInput): Promise<SearchOutput> {
     try {
+      const firstName = Raw((firstName) => {
+        return `${firstName} ILIKE '%${searchTerm}%'`;
+      });
+      const lastName = Raw((lastName) => {
+        return `${lastName} ILIKE '%${searchTerm}%'`;
+      });
+
       const [users, usersCount] = await this.userRepo.findAndCount({
-        where: [
-          {
-            firstName: Raw(
-              (firstName) => `${firstName} ILIKE '%${searchTerm}%'`,
-            ),
-          },
-          {
-            lastName: Raw((lastName) => `${lastName} ILIKE '%${searchTerm}%'`),
-          },
-        ],
+        where: [{ firstName }, { lastName }],
         take: 3,
       });
+      const name = Raw((name) => {
+        return `${name} ILIKE '%${searchTerm}%'`;
+      });
+
       const [trips, tripsCount] = await this.tripRepo.findAndCount({
-        where: {
-          name: Raw((name) => `${name} ILIKE '%${searchTerm}%'`),
-          availability: Availability.Public,
-        },
+        where: { name, availability: Availability.Public },
         take: 3,
         relations: ['traveler'],
       });
+
       return { ok: true, users, usersCount, trips, tripsCount };
     } catch {
       return { ok: false, error: COMMON_ERR.InternalServerErr };
