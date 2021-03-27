@@ -8,5 +8,5 @@ export class ToggleLikeInput extends PickType(Step, ['id']) {}
 @ObjectType()
 export class ToggleLikeOutput extends CoreOutput {
   @Field(() => Number, { nullable: true })
-  toggle?: number;
+  toggle?: 999 | -999;
 }

@@ -103,11 +103,11 @@ export class StepService {
   async didILiked(step: Step, authUser: Users) {
     if (!authUser) return false;
 
-    return Boolean(
-      await this.likeRepo.count({
-        where: { userId: authUser.id, stepId: step.id },
-      }),
-    );
+    const count = await this.likeRepo.count({
+      where: { userId: authUser.id, stepId: step.id },
+    });
+
+    return Boolean(count);
   }
 }
 
