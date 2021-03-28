@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { COMMENT_ERR } from 'src/errors/comment.errors';
+import { COMMON_ERR } from 'src/errors/common.errors';
+import { STEP_ERR } from 'src/errors/step.errors';
 import { Step } from 'src/step/entities/step.entity';
 import { Users } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -31,15 +34,15 @@ export class CommentService {
         id: createCommentInput.stepId,
       });
       if (!step) {
-        return { ok: false, error: 'Step not found.' };
+        return { ok: false, error: STEP_ERR.StepNotFound };
       }
-      const comment = await this.commentRepo.create(createCommentInput);
+      const comment = this.commentRepo.create(createCommentInput);
       comment.creator = user;
       comment.step = step;
       const savedComment = await this.commentRepo.save(comment);
       return { ok: true, commentId: savedComment.id };
     } catch {
-      return { ok: false, error: 'Failed to create comment.' };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -69,7 +72,7 @@ export class CommentService {
       };
     } catch (err) {
       console.error(err);
-      return { ok: false, error: 'Failed to load comments.' };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 
@@ -80,18 +83,18 @@ export class CommentService {
     try {
       const comment = await this.commentRepo.findOne(id);
       if (!comment) {
-        return { ok: false, error: 'Comment not found.' };
+        return { ok: false, error: COMMENT_ERR.CommentNotFound };
       }
       if (comment.creatorId !== user.id) {
-        return { ok: false, error: 'Not authorized.' };
+        return { ok: false, error: COMMON_ERR.NotAuthorized };
       }
       const deleteResult = await this.commentRepo.delete({ id });
       if (deleteResult.affected === 0) {
-        return { ok: false, error: 'Failed to delete comment.' };
+        throw new Error();
       }
       return { ok: true };
     } catch {
-      return { ok: false, error: 'Failed to delete comment.' };
+      return { ok: false, error: COMMON_ERR.InternalServerErr };
     }
   }
 }
