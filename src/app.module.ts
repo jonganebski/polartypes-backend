@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
 import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/entities/comment.entity';
+import { HEADERS_TOKEN_NAME } from './common/common.constants';
 import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
 import { Like } from './step/entities/like.entity';
@@ -54,12 +55,11 @@ import { UsersModule } from './users/user.module';
             : 'https://polartypes.netlify.app',
       },
       context: ({ req, connection }) => {
-        const TOKEN_KEY = 'x-jwt';
         if (req) {
-          return { token: req.headers[TOKEN_KEY] };
+          return { token: req.headers[HEADERS_TOKEN_NAME] };
         }
         if (connection) {
-          return { token: connection.context[TOKEN_KEY] };
+          return { token: connection.context[HEADERS_TOKEN_NAME] };
         }
       },
     }),
